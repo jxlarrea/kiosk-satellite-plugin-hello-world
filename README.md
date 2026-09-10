@@ -39,7 +39,14 @@ Create a separate repository from this template. Change `manifest.json`, the Jav
 
 Rebuilding with different toolchains can change the package hash. Publish the exact ZIP used to generate the descriptor. The descriptor contains the runtime manifest and package checksum. Keeping it outside the ZIP avoids a circular checksum.
 
-See the [SDK documentation](https://github.com/jxlarrea/kiosk-satellite-plugins/blob/main/docs/creating-plugins.md) for the API and package contract.
+## Plugin documentation
+
+This repository is the home for all Kiosk Satellite plugin documentation and the self-contained Hello World template.
+
+- [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
+- [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, package format, build tools and publishing.
+
+Use `python3 tools/check-sdk.py /path/to/kiosk-satellite` to verify that the template's SDK interfaces match the application.
 
 ## License
 

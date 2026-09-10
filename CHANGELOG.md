@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Consolidated plugin installation and SDK documentation in the Hello World repository.
+- Included the SDK consistency check alongside the template's build and test tools.
+
 ## 1.0.0
 
 - Floating Hello World window with a configurable greeting and button counter.
