@@ -18,7 +18,7 @@ The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contr
 
 ## Test a local build
 
-Use **Plugins > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
+Use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
 
 Local packages use the same 4 MB size limit, manifest validation and DEX checks as release packages. Installation leaves the plugin disabled. To test another build, disable the plugin and restart Kiosk before installing the replacement ZIP. Compatible settings are retained. A local ZIP cannot replace a plugin installed from GitHub. Uninstall that plugin first, which also deletes its settings.
 

@@ -6,7 +6,7 @@ A simple plugin template that opens a draggable greeting window over your Home A
 
 This plugin requires a Kiosk Satellite build with SDK 1 plugin support and Android 7.0 or newer.
 
-1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin and turn on **Enable Plugins**.
+1. Open **Settings > Plugin Manager** on the kiosk or **Plugin Manager** in remote admin and turn on **Enable Plugins**.
 2. Choose **Add plugin**, paste this repository's GitHub URL and choose **Preview**.
 3. Read the manifest and this README. Choose **Trust and install** if you trust the code.
 4. Enable **Hello World** from its entry row. Return to the dashboard to see the window.
@@ -28,7 +28,7 @@ python3 tools/build.py
 
 The build creates `dist/hello-world-1.0.1.zip`, its `.zip.sha256` checksum file and a copy of `kiosk-satellite-plugin.json` in `dist/`. The ZIP contains that same manifest. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
 
-To test a local build, open **Plugins > Developer Tools > Install from ZIP** on the kiosk or remote admin and select the ZIP from `dist/`. Confirm that you trust the code, then enable the plugin from its entry row. No GitHub release is needed. To replace a plugin that has run, disable it and restart Kiosk before installing the new ZIP. Compatible settings are retained. If the existing plugin was installed from GitHub, uninstall it before switching to a local build. Uninstalling deletes its settings.
+To test a local build, open **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin and select the ZIP from `dist/`. Confirm that you trust the code, then enable the plugin from its entry row. No GitHub release is needed. To replace a plugin that has run, disable it and restart Kiosk before installing the new ZIP. Compatible settings are retained. If the existing plugin was installed from GitHub, uninstall it before switching to a local build. Uninstalling deletes its settings.
 
 ## Publish your own plugin
 

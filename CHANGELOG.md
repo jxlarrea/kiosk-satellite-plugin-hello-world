@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Rename the settings feature to Plugin Manager and hide its follow-up controls while the master switch is off.
+
 ### Added
 
 - Document the persistent Enable Plugins master switch, paused plugin behavior and state commands.

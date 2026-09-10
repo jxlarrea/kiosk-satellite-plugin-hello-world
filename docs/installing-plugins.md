@@ -1,10 +1,10 @@
-# Plugins
+# Plugin Manager
 
 Plugins add optional features to Kiosk Satellite. The first SDK supports a floating window over the dashboard, plugin settings and plugin commands. Each plugin lives in its own public GitHub repository. This repository contains the Hello World template, SDK, build tools and plugin documentation.
 
 ## Install Hello World
 
-1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin and turn on **Enable Plugins**.
+1. Open **Settings > Plugin Manager** on the kiosk or **Plugin Manager** in remote admin and turn on **Enable Plugins**.
 2. Choose **Add plugin**, paste its public GitHub repository URL and choose **Preview**.
 3. Review the latest stable release's manifest, author, license, capabilities and README. Compatibility errors prevent installation.
 4. Choose **Trust and install**. Installation downloads and verifies the reviewed release without running its code.
@@ -20,7 +20,7 @@ The window stays inside Kiosk Satellite. It needs no Android permission to draw 
 
 ## Enable Plugins
 
-The master **Enable Plugins** switch controls plugin execution and saves its state across app restarts. Turning it off closes plugin windows, revokes host callbacks and stops active sessions. Each plugin keeps its own enabled choice and settings. Selected plugins show **Paused** until the master switch is on again, then resume. Per-plugin switches and actions are unavailable while the master switch is off. You can still install, configure or uninstall plugins.
+The master **Enable Plugins** switch controls plugin execution and saves its state across app restarts. Turning it off closes plugin windows, revokes host callbacks and stops active sessions. Each plugin keeps its own enabled choice and settings. When the master switch is off, Plugin Manager shows only that switch and hides the remaining settings. Open plugin subpages return to Plugin Manager. Turning the switch back on reveals the controls and resumes the selected plugins.
 
 Plugins start off on kiosks with no installed plugins. Upgrading a kiosk that already has plugins preserves its existing behavior. Newly installed plugins still start individually disabled even when the master switch is on.
 
