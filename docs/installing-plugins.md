@@ -4,7 +4,7 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 
 ## Install Hello World
 
-1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin.
+1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin and turn on **Enable Plugins**.
 2. Choose **Add plugin**, paste its public GitHub repository URL and choose **Preview**.
 3. Review the latest stable release's manifest, author, license, capabilities and README. Compatibility errors prevent installation.
 4. Choose **Trust and install**. Installation downloads and verifies the reviewed release without running its code.
@@ -12,11 +12,17 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 
 Tap an installed plugin's entry row to open its subpage. Its settings, commands and saved README appear there. Enable, disable and uninstall controls stay on the entry row. Remote admin uses the same layout and supports direct links to plugin subpages.
 
-The page includes an introduction and a warning about plugin access. Plugin status refreshes when you open the page.
+The master switch explains that plugins add community developed features. A warning about plugin access appears below **Add plugin**. Plugin status refreshes when you open the page.
 
 Drag the window by its title bar. **Say hello** updates its greeting count. Close dismisses the window without disabling the plugin. **Show window** in plugin settings opens it again. The Greeting setting changes its message. **Show window when enabled** controls whether it opens automatically.
 
 The window stays inside Kiosk Satellite. It needs no Android permission to draw over other apps. The drawer, media player, screensaver, notifications and lockdown shield keep their existing priority above it. Touches outside the window reach the dashboard.
+
+## Enable Plugins
+
+The master **Enable Plugins** switch controls plugin execution and saves its state across app restarts. Turning it off closes plugin windows, revokes host callbacks and stops active sessions. Each plugin keeps its own enabled choice and settings. Selected plugins show **Paused** until the master switch is on again, then resume. Per-plugin switches and actions are unavailable while the master switch is off. You can still install, configure or uninstall plugins.
+
+Plugins start off on kiosks with no installed plugins. Upgrading a kiosk that already has plugins preserves its existing behavior. Newly installed plugins still start individually disabled even when the master switch is on.
 
 ## Developer Tools
 
@@ -48,7 +54,9 @@ The existing authenticated command API exposes these commands:
 
 | Command | Parameters |
 | --- | --- |
-| `listPlugins` | None |
+| `getPluginState` | None. Returns the master `enabled` flag and `plugins` list |
+| `setPluginsEnabled` | `enabled`: boolean master switch |
+| `listPlugins` | None. Returns the installed plugin list |
 | `previewPluginRepository` | `url`: public GitHub repository URL |
 | `installPlugin` | `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
 | `installPluginRepository` | `previewId`: returned by preview, `trusted`: true |

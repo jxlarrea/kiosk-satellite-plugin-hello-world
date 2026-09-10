@@ -4,6 +4,7 @@
 
 ### Added
 
+- Document the persistent Enable Plugins master switch, paused plugin behavior and state commands.
 - Document local ZIP testing through the Developer Tools group on the kiosk and remote admin.
 
 ## 1.0.1

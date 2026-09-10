@@ -6,10 +6,12 @@ A simple plugin template that opens a draggable greeting window over your Home A
 
 This plugin requires a Kiosk Satellite build with SDK 1 plugin support and Android 7.0 or newer.
 
-1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin.
+1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin and turn on **Enable Plugins**.
 2. Choose **Add plugin**, paste this repository's GitHub URL and choose **Preview**.
 3. Read the manifest and this README. Choose **Trust and install** if you trust the code.
 4. Enable **Hello World** from its entry row. Return to the dashboard to see the window.
+
+The master **Enable Plugins** switch pauses all plugins and closes their windows. It keeps each plugin's enabled choice and settings, so turning it back on resumes the selected plugins.
 
 Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Save settings to apply changes. **Show window** reopens a dismissed window and **Hide window** closes it. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
 

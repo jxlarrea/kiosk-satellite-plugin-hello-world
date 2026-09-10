@@ -105,7 +105,7 @@ Implement `me.jxl.kiosk.plugins.KioskPlugin`:
 
 Callbacks run serially on a worker dedicated to the plugin. They must finish within three seconds. The host disables a plugin after a callback error or timeout. Keep long work asynchronous and honor interruption. Host calls are ignored after the plugin stops. A timed-out thread can keep running if it ignores interruption, since this runtime does not isolate plugin code.
 
-The host rejects settings with unknown keys or incorrect types. Defaults fill missing keys. Installation does not run plugin code and leaves the plugin disabled. The host calls `start` after explicit enable or at app startup for an enabled plugin.
+The host rejects settings with unknown keys or incorrect types. Defaults fill missing keys. Installation does not run plugin code and leaves the plugin disabled. The host calls `start` after explicit enable or at app startup for an enabled plugin while the master **Enable Plugins** switch is on. Turning the master switch off calls `stop` and revokes host callbacks without changing the plugin's saved enabled choice or settings. Turning it on starts the selected plugins again. An off master switch prevents startup and execution across app restarts.
 
 To replace a loaded plugin, disable it and restart Kiosk first. Preview the same repository again, install its replacement release and enable it. Compatible settings are retained. Removing a plugin deletes its saved settings.
 
