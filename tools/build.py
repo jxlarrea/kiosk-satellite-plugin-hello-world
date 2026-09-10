@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Build a plugin ZIP with the published SDK and the Android DEX compiler."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import zipfile
+
+ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('plugin', nargs='?', default=str(ROOT), help='Path to the plugin repository')
+args = parser.parse_args()
+plugin = Path(args.plugin).resolve()
+manifest = json.loads((plugin / 'manifest.json').read_text())
+sdk_root = Path(os.environ.get('ANDROID_HOME', os.environ.get('ANDROID_SDK_ROOT', str(Path.home() / 'android-sdk'))))
+java_root = os.environ.get('JAVA_HOME')
+def java_tool(name):
+    return str(Path(java_root) / 'bin' / name) if java_root else name
+build_tools = sorted((sdk_root / 'build-tools').glob('*/d8'), key=lambda p: tuple(int(v) for v in p.parent.name.split('.') if v.isdigit()))
+if not build_tools:
+    raise SystemExit('Set ANDROID_HOME to an Android SDK with build-tools installed.')
+platforms = sorted((sdk_root / 'platforms').glob('android-*/android.jar'), key=lambda p: int(p.parent.name.split('-')[1]))
+if not platforms:
+    raise SystemExit('Install an Android SDK platform first.')
+out = plugin / 'dist'
+out.mkdir(exist_ok=True)
+with tempfile.TemporaryDirectory(prefix='kiosk-plugin-') as temp:
+    temp = Path(temp)
+    sdk_classes, classes, dex = [temp / name for name in ('sdk', 'classes', 'dex')]
+    for folder in (sdk_classes, classes, dex):
+        folder.mkdir()
+    subprocess.run([java_tool('javac'), '--release', '8', '-d', str(sdk_classes), *map(str, sorted((ROOT / 'sdk/src').rglob('*.java')))], check=True)
+    sdk_jar = out / 'kiosk-plugin-sdk-1.jar'
+    subprocess.run([java_tool('jar'), 'cf', str(sdk_jar), '-C', str(sdk_classes), '.'], check=True)
+    subprocess.run([java_tool('javac'), '--release', '8', '-cp', os.pathsep.join([str(sdk_jar), str(platforms[-1])]), '-d', str(classes), *map(str, sorted((plugin / 'src').rglob('*.java')))], check=True)
+    subprocess.run([str(build_tools[-1]), '--min-api', str(manifest['minAndroidSdk']), '--lib', str(platforms[-1]), '--classpath', str(sdk_jar), '--output', str(dex), *map(str, sorted(classes.rglob('*.class')))], check=True)
+    jar = temp / 'plugin.jar'
+    def add(archive, name, data):
+        info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
+        info.compress_type = zipfile.ZIP_DEFLATED
+        info.external_attr = 0o644 << 16
+        archive.writestr(info, data)
+    with zipfile.ZipFile(jar, 'w', zipfile.ZIP_DEFLATED) as archive:
+        for file in sorted(dex.glob('*.dex')):
+            add(archive, file.name, file.read_bytes())
+    package = out / f"{manifest['id']}-{manifest['version']}.zip"
+    with zipfile.ZipFile(package, 'w', zipfile.ZIP_DEFLATED) as archive:
+        add(archive, 'manifest.json', (plugin / 'manifest.json').read_bytes())
+        add(archive, 'plugin.jar', jar.read_bytes())
+        add(archive, 'LICENSE', (plugin / 'LICENSE').read_bytes())
+    digest = hashlib.sha256(package.read_bytes()).hexdigest()
+    package.with_suffix('.zip.sha256').write_text(f'{digest}  {package.name}\n')
+    descriptor = {
+        'schemaVersion': 1,
+        'manifest': manifest,
+        'download': {'tag': f"v{manifest['version']}", 'asset': package.name, 'sha256': digest},
+    }
+    (plugin / 'kiosk-plugin.json').write_text(json.dumps(descriptor, indent=2) + '\n')
+    print(f'Package: {package}\nSHA-256: {digest}\nSDK: {sdk_jar}')
