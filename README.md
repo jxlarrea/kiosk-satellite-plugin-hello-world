@@ -26,7 +26,7 @@ python3 tools/build.py
 
 The build creates `dist/hello-world-1.0.1.zip`, its `.zip.sha256` checksum file and a copy of `kiosk-satellite-plugin.json` in `dist/`. The ZIP contains that same manifest. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
 
-To test an installable build, publish a release in your plugin repository and install it through **Plugins > Add plugin**. To replace a plugin that has run, disable it and restart Kiosk before installing the replacement.
+To test a local build, open **Plugins > Developer Tools > Install from ZIP** on the kiosk or remote admin and select the ZIP from `dist/`. Confirm that you trust the code, then enable the plugin from its entry row. No GitHub release is needed. To replace a plugin that has run, disable it and restart Kiosk before installing the new ZIP. Compatible settings are retained. If the existing plugin was installed from GitHub, uninstall it before switching to a local build. Uninstalling deletes its settings.
 
 ## Publish your own plugin
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Document local ZIP testing through the Developer Tools group on the kiosk and remote admin.
+
 ## 1.0.1
 
 ### Changed

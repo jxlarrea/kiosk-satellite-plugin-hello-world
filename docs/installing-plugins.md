@@ -12,11 +12,17 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 
 Tap an installed plugin's entry row to open its subpage. Its settings, commands and saved README appear there. Enable, disable and uninstall controls stay on the entry row. Remote admin uses the same layout and supports direct links to plugin subpages.
 
-The page includes an introduction and a warning about plugin access. Plugin status refreshes when you open the page. Local ZIP installation is not available.
+The page includes an introduction and a warning about plugin access. Plugin status refreshes when you open the page.
 
 Drag the window by its title bar. **Say hello** updates its greeting count. Close dismisses the window without disabling the plugin. **Show window** in plugin settings opens it again. The Greeting setting changes its message. **Show window when enabled** controls whether it opens automatically.
 
 The window stays inside Kiosk Satellite. It needs no Android permission to draw over other apps. The drawer, media player, screensaver, notifications and lockdown shield keep their existing priority above it. Touches outside the window reach the dashboard.
+
+## Developer Tools
+
+Choose **Install from ZIP** in the **Developer Tools** group to test a local plugin build. On the kiosk, select a file through Android's file picker. In remote admin, select a file from your computer. Review the filename and trust warning, then choose **Trust and install**. The package is validated before installation and starts disabled. Enable it from its entry row when ready.
+
+ZIPs must be at most 4 MB and contain `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. Local installs do not need a GitHub release or a separate checksum file. They do not have a repository README. To replace a local build that has run, disable the plugin and restart Kiosk first. Compatible settings are retained. Uninstall a repository-installed plugin before switching to a local build. Uninstalling removes its settings.
 
 ## Lifecycle and updates
 
@@ -44,6 +50,7 @@ The existing authenticated command API exposes these commands:
 | --- | --- |
 | `listPlugins` | None |
 | `previewPluginRepository` | `url`: public GitHub repository URL |
+| `installPlugin` | `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
 | `installPluginRepository` | `previewId`: returned by preview, `trusted`: true |
 | `enablePlugin` | `id` |
 | `disablePlugin` | `id` |
