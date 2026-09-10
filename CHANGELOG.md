@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Document the entry row update check and info modal, automatic stop and resume during updates and rollback after failed activation.
+
 - Rename the settings feature to Plugin Manager and hide its follow-up controls while the master switch is off.
 
 ### Added

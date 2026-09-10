@@ -20,7 +20,7 @@ The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contr
 
 Use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
 
-Local packages use the same 4 MB size limit, manifest validation and DEX checks as release packages. Installation leaves the plugin disabled. To test another build, disable the plugin and restart Kiosk before installing the replacement ZIP. Compatible settings are retained. A local ZIP cannot replace a plugin installed from GitHub. Uninstall that plugin first, which also deletes its settings.
+Local packages use the same 4 MB size limit, manifest validation and DEX checks as release packages. New plugins start disabled. To test another build, install the replacement ZIP directly. KS automatically stops running plugins and restores their enabled state after the update. A normal update does not require an app restart. Compatible settings are retained. A local ZIP cannot replace a plugin installed from GitHub. Uninstall that plugin first, which also deletes its settings.
 
 ## Repository and release
 
@@ -105,9 +105,9 @@ Implement `me.jxl.kiosk.plugins.KioskPlugin`:
 
 Callbacks run serially on a worker dedicated to the plugin. They must finish within three seconds. The host disables a plugin after a callback error or timeout. Keep long work asynchronous and honor interruption. Host calls are ignored after the plugin stops. A timed-out thread can keep running if it ignores interruption, since this runtime does not isolate plugin code.
 
-The host rejects settings with unknown keys or incorrect types. Defaults fill missing keys. Installation does not run plugin code and leaves the plugin disabled. The host calls `start` after explicit enable or at app startup for an enabled plugin while the master **Enable Plugins** switch is on. Turning the master switch off calls `stop` and revokes host callbacks without changing the plugin's saved enabled choice or settings. Turning it on starts the selected plugins again. An off master switch prevents startup and execution across app restarts.
+The host rejects settings with unknown keys or incorrect types. Defaults fill missing keys. First-time installation does not run plugin code and leaves the plugin disabled. Updates automatically stop the old session and restart the replacement if the plugin was enabled and the master switch is on. Disabled plugins stay disabled. Updates while the master switch is off retain the enabled choice without running code. The host calls `start` after explicit enable or at app startup for an enabled plugin while the master **Enable Plugins** switch is on. Turning the master switch off calls `stop` and revokes host callbacks without changing the plugin's saved enabled choice or settings. Turning it on starts the selected plugins again. An off master switch prevents startup and execution across app restarts.
 
-To replace a loaded plugin, disable it and restart Kiosk first. Preview the same repository again, install its replacement release and enable it. Compatible settings are retained. Removing a plugin deletes its saved settings.
+To replace a loaded plugin, preview the same repository again and install its replacement release. KS stops the old session and restores its enabled state automatically. A normal update does not require an app restart. Compatible settings are retained. Removing a plugin deletes its saved settings.
 
 ## Floating window
 

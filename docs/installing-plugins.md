@@ -10,7 +10,7 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 4. Choose **Trust and install**. Installation downloads and verifies the reviewed release without running its code.
 5. Enable **Hello World** using the switch on its entry row. Return to the dashboard to see its window.
 
-Tap an installed plugin's entry row to open its subpage. Its settings, commands and saved README appear there. Enable, disable and uninstall controls stay on the entry row. Remote admin uses the same layout and supports direct links to plugin subpages.
+Tap an installed plugin's entry row to open its subpage. Its settings and commands appear there. The enable switch sits on the left of the entry row. The check for updates button beside info checks the latest stable GitHub release and lets you review and install an available update. It reports when no update is available. Local ZIP installs use Install from ZIP instead. The info button before delete opens the saved repository README in a modal, including while offline. Local ZIP installs show a message explaining that no repository README is available. Remote admin uses the same layout and supports direct links to plugin subpages.
 
 The master switch explains that plugins add community developed features. A warning about plugin access appears below **Add plugin**. Plugin status refreshes when you open the page.
 
@@ -28,15 +28,15 @@ Plugins start off on kiosks with no installed plugins. Upgrading a kiosk that al
 
 Choose **Install from ZIP** in the **Developer Tools** group to test a local plugin build. On the kiosk, select a file through Android's file picker. In remote admin, select a file from your computer. Review the filename and trust warning, then choose **Trust and install**. The package is validated before installation and starts disabled. Enable it from its entry row when ready.
 
-ZIPs must be at most 4 MB and contain `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. Local installs do not need a GitHub release or a separate checksum file. They do not have a repository README. To replace a local build that has run, disable the plugin and restart Kiosk first. Compatible settings are retained. Uninstall a repository-installed plugin before switching to a local build. Uninstalling removes its settings.
+ZIPs must be at most 4 MB and contain `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. Local installs do not need a GitHub release or a separate checksum file. They do not have a repository README. Install the replacement ZIP directly. KS stops the old session and restores its enabled state automatically. A normal update does not require an app restart. Compatible settings are retained. Uninstall a repository-installed plugin before switching to a local build. Uninstalling removes its settings.
 
 ## Lifecycle and updates
 
-Installed plugins start disabled. Enabling a plugin runs it immediately and saves that choice for the next app start. Disabling removes its window, revokes its host callbacks and asks it to stop. Removing also deletes its settings.
+New plugins start disabled. Enabling a plugin runs it immediately and saves that choice for the next app start. Disabling removes its window, revokes its host callbacks and asks it to stop. Removing also deletes its settings.
 
-To replace a plugin that has run in the current process, disable it and restart Kiosk Satellite first. Then preview the same repository again and install the replacement release. The replacement starts disabled. Compatible settings are retained. A replacement with incompatible saved setting types is rejected, leaving the old package installed. Remove and reinstall if you want to discard those settings.
+To update a plugin, use its check for updates button and review the replacement release before choosing **Trust and update**. KS validates the replacement before stopping the active session, then restores the enabled state automatically. Disabled plugins stay disabled. If the master switch is off, the saved enabled choice is retained without running code. A normal update does not require an app restart. If activation fails, KS restores the previous package and settings and resumes it when shutdown was clean. Compatible settings are retained. A replacement with incompatible saved setting types is rejected, leaving the old package installed. Remove and reinstall if you want to discard those settings.
 
-Each callback has a three-second deadline. A failure disables that plugin and records the error in settings. Threads that ignore interruption cannot be forcibly stopped safely, so a misbehaving native plugin may require an app restart. An unfinished automatic plugin startup causes enabled plugins to be disabled on the next launch. This recovery can also trigger if Android kills the process during the startup grace period.
+Each callback has a three-second deadline. A failure disables that plugin and records the error in settings. A timed-out callback or failed stop blocks enabling and replacing that plugin until the app restarts. Threads that ignore interruption cannot be forcibly stopped safely. An unfinished automatic plugin startup causes enabled plugins to be disabled on the next launch. This recovery can also trigger if Android kills the process during the startup grace period.
 
 ## Trust and package checks
 
@@ -58,6 +58,7 @@ The existing authenticated command API exposes these commands:
 | `setPluginsEnabled` | `enabled`: boolean master switch |
 | `listPlugins` | None. Returns the installed plugin list |
 | `previewPluginRepository` | `url`: public GitHub repository URL |
+| `checkPluginUpdate` | `id` |
 | `installPlugin` | `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
 | `installPluginRepository` | `previewId`: returned by preview, `trusted`: true |
 | `enablePlugin` | `id` |
