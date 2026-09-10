@@ -74,7 +74,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | Field | Meaning |
 | --- | --- |
 | `schemaVersion` | Must be `1` |
-| `apiVersion` | Must be `1` |
+| `apiVersion` | `1` for the original SDK or `2` for native files and richer controls |
 | `id` | Stable lowercase ID with optional hyphens, at most 64 characters |
 | `name` | Display name, at most 80 characters |
 | `version` | `major.minor.patch` with optional prerelease suffix |
@@ -83,7 +83,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `description` | Plain text, at most 1000 characters |
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
-| `capabilities` | Array of required SDK capabilities. Only `overlay` is supported |
+| `capabilities` | `overlay` in SDK 1. SDK 2 also supports `native` and `entities` |
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
 
@@ -129,6 +129,29 @@ The window floats over the dashboard and is draggable by its title bar. Other ki
 
 A plugin executes inside Kiosk Satellite with the application's identity. This is not a sandbox. The capabilities array identifies SDK requirements and does not restrict arbitrary Java code. Do not copy app implementation classes into your plugin or rely on internal classes discovered through reflection.
 
-SDK 1 does not expose app commands, Home Assistant credentials, hardware services, ESPHome entities or voice events through its API. Those APIs can be designed as later versioned capabilities. Native library packaging and automatic updates are future work.
+SDK 1 does not expose app commands, Home Assistant credentials, hardware services, ESPHome entities or voice events through its API. Those APIs can be designed as later versioned capabilities. SDK 2 adds native library packaging and RGB entities. Repository updates are reviewed from the installed entry row.
 
 Publish source code alongside release packages. A checksum detects changed bytes but does not authenticate a publisher. Users must trust the repository author. Plugin authors remain responsible for all licenses and notices included in their packages.
+
+## SDK 2
+
+The host still accepts SDK 1 packages. A package using the following additions must declare `apiVersion: 2`.
+
+Settings can add `group` and `description` fields. A `number` setting declares finite `min`, `max`, `step` and a numeric default. Values must match that range and step. A `color` setting stores `#RRGGBB` and uses the app color picker. A `select` setting declares up to 32 unique string `options` and a default from that list. The same controls appear in the native app and Remote Admin.
+
+The `native` capability allows shared libraries under `native/ABI/libNAME.so`, with arm64-v8a, armeabi-v7a and x86_64 supported. ELF architecture and stored digests are checked. The existing 4 MB package and expanded-content limits still apply. The host supplies a separate native library path for each session, so a disabled plugin can be enabled again without reusing a library owned by a previous class loader. Files potentially referenced by loaded code remain until a later app start.
+
+| Host method | Purpose |
+| --- | --- |
+| `nativeLibraryPath(name)` | Absolute path to a verified session copy of `libNAME.so`. Requires `native` |
+| `packagePath()` | Verified DEX container path for a plugin-owned helper. Requires `native` |
+| `status(message, error)` | Runtime status text in the plugin subpage, up to 1000 characters |
+| `saveSettings(values)` | Validate and persist plugin-originated setting changes |
+| `publishLight(key, name, effects, state)` | Register or update an RGB light. Requires `entities` |
+| `removeLight(key)` | Remove a light from this plugin's active catalog |
+
+RGB state contains `on`, `brightness`, `red`, `green`, `blue` and `effect`. Numeric channels use 0 to 1. A plugin can publish up to four lights and each can advertise up to 24 effects. Home Assistant commands arrive through `onEvent("light.KEY", payload)` with the fields that were supplied. Stable object IDs are namespaced by plugin ID and key. Command handlers should update their internal state, apply the change and publish the resulting state. Use `saveSettings` when the command changes persisted settings.
+
+Entity catalog changes reconnect ESPHome. State updates do not. Disabling a plugin revokes its host and removes its entities. Plugin-owned threads and helper processes must stop before `stop()` returns. The three-second callback deadline still applies. Long permission prompts must happen on a plugin-owned worker that can be canceled during shutdown.
+
+The Rockchip LED Control repository demonstrates these additions without putting a device driver into KS itself.

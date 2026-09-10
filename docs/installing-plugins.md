@@ -46,7 +46,7 @@ The installer accepts ZIPs up to 4 MB and limits expanded content, including nes
 
 Repository installation discovers the latest stable GitHub release. It reads the attached `kiosk-satellite-plugin.json` and package checksum, then reads `README.md` from the release tag's commit. Drafts and prereleases are excluded. The ZIP contains the same `kiosk-satellite-plugin.json`. Default-branch edits do not change the released documentation. Previews expire after 15 minutes. Installation checks the downloaded bytes and packaged manifest against the preview. Another repository cannot replace an installed plugin with the same ID without uninstalling it first. The reviewed README, release tag and source revision are saved for offline viewing.
 
-Publisher signatures, private repositories, automatic updates, native library packaging, hardware APIs, ESPHome plugin entities and voice lifecycle subscriptions are not part of SDK 1. Plugin packages and settings are not included in Kiosk configuration export or fleet sync yet.
+Publisher signatures, private repositories, automatic background updates, hardware APIs and voice lifecycle subscriptions are not part of SDK 1. SDK 2 adds native library packaging and ESPHome RGB plugin entities. Plugin packages and settings are not included in Kiosk configuration export or fleet sync yet.
 
 ## Remote API
 

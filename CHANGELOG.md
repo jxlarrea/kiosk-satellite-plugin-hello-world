@@ -10,6 +10,8 @@
 
 ### Added
 
+- Document SDK 2 native files, rich settings, runtime status and RGB entities and vendor backward-compatible host interfaces.
+
 - Document the persistent Enable Plugins master switch, paused plugin behavior and state commands.
 - Document local ZIP testing through the Developer Tools group on the kiosk and remote admin.
 
