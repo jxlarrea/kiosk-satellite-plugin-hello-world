@@ -6,7 +6,7 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 
 1. Open **Settings > Plugins** on the kiosk or **Plugins** in remote admin.
 2. Choose **Add plugin**, paste its public GitHub repository URL and choose **Preview**.
-3. Review its manifest, author, license, capabilities and README. Compatibility errors prevent installation.
+3. Review the latest stable release's manifest, author, license, capabilities and README. Compatibility errors prevent installation.
 4. Choose **Trust and install**. Installation downloads and verifies the reviewed release without running its code.
 5. Enable **Hello World** using the switch on its entry row. Return to the dashboard to see its window.
 
@@ -30,9 +30,9 @@ Each callback has a three-second deadline. A failure disables that plugin and re
 
 Native plugins run inside Kiosk Satellite with its app identity. They are trusted code and are not sandboxed. A plugin can access app data and Android permissions already granted to Kiosk. Its capability list describes the supported SDK features it uses and is not a security boundary.
 
-The installer accepts ZIPs up to 4 MB and limits expanded content, including nested DEX content. It rejects unexpected paths, duplicate files, unsupported SDK versions and unsupported capabilities. Code is stored in private app storage with read-only DEX containers. Stored digests are checked before loading. A required SHA-256 checks the downloaded package against the reviewed repository manifest. A hash does not establish who wrote a package.
+The installer accepts ZIPs up to 4 MB and limits expanded content, including nested DEX content. It rejects unexpected paths, duplicate files, unsupported SDK versions and unsupported capabilities. Code is stored in private app storage with read-only DEX containers. Stored digests are checked before loading. A required SHA-256 from the release checksum file checks the downloaded package against the reviewed release. A hash does not establish who wrote a package.
 
-Repository installation reads root `kiosk-plugin.json` and `README.md` from one pinned default-branch commit. Each descriptor includes the full runtime manifest, release tag, ZIP asset name and required SHA-256. Previews expire after 15 minutes. Installation checks the downloaded bytes and packaged manifest against the preview. Another repository cannot replace an installed plugin with the same ID without uninstalling it first. The reviewed README and source revision are saved for offline viewing.
+Repository installation discovers the latest stable GitHub release. It reads the attached `kiosk-satellite-plugin.json` and package checksum, then reads `README.md` from the release tag's commit. Drafts and prereleases are excluded. The ZIP contains the same `kiosk-satellite-plugin.json`. Default-branch edits do not change the released documentation. Previews expire after 15 minutes. Installation checks the downloaded bytes and packaged manifest against the preview. Another repository cannot replace an installed plugin with the same ID without uninstalling it first. The reviewed README, release tag and source revision are saved for offline viewing.
 
 Publisher signatures, private repositories, automatic updates, native library packaging, hardware APIs, ESPHome plugin entities and voice lifecycle subscriptions are not part of SDK 1. Plugin packages and settings are not included in Kiosk configuration export or fleet sync yet.
 

@@ -24,20 +24,22 @@ python3 tools/test.py
 python3 tools/build.py
 ```
 
-The build creates `dist/hello-world-1.0.0.zip`, its SHA-256 file and the root `kiosk-plugin.json` repository descriptor. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
+The build creates `dist/hello-world-1.0.1.zip`, its `.zip.sha256` checksum file and a copy of `kiosk-satellite-plugin.json` in `dist/`. The ZIP contains that same manifest. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
 
 To test an installable build, publish a release in your plugin repository and install it through **Plugins > Add plugin**. To replace a plugin that has run, disable it and restart Kiosk before installing the replacement.
 
 ## Publish your own plugin
 
-Create a separate repository from this template. Change `manifest.json`, the Java class/package and this README. Keep the plugin ID stable after publication.
+Create a separate repository from this template. Change `kiosk-satellite-plugin.json`, the Java class/package and this README. Keep the plugin ID stable after publication.
 
 1. Build and test the release.
-2. Commit the source, README and generated `kiosk-plugin.json` to the default branch.
-3. Create the release tag named in `download.tag` and upload the exact ZIP from `dist/` as the asset named in `download.asset`.
+2. Commit the source, README and `kiosk-satellite-plugin.json`.
+3. Create a GitHub release tagged at that commit. Attach `kiosk-satellite-plugin.json`, `<id>-<version>.zip` and `<id>-<version>.zip.sha256` from `dist/`. Publish it as the latest stable release.
 4. Share the public repository URL. Each repository contains one plugin.
 
-Rebuilding with different toolchains can change the package hash. Publish the exact ZIP used to generate the descriptor. The descriptor contains the runtime manifest and package checksum. Keeping it outside the ZIP avoids a circular checksum.
+KS discovers the latest stable GitHub release, previews its attached manifest and reads the README from the tagged commit. It downloads the ZIP only after confirmation and verifies the checksum and packaged manifest. Drafts and prereleases are excluded.
+
+Rebuilding with different toolchains can change the package hash. Upload the three files from the same build. The checksum stays outside the ZIP to avoid a circular checksum.
 
 ## Plugin documentation
 

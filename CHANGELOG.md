@@ -1,9 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.0.1
 
 ### Changed
 
+- Use `kiosk-satellite-plugin.json` as the single manifest in the repository, release assets and plugin ZIP.
+- Discover plugins through the latest stable GitHub release with a separate checksum and README from the release tag.
 - Consolidated plugin installation and SDK documentation in the Hello World repository.
 - Included the SDK consistency check alongside the template's build and test tools.
 

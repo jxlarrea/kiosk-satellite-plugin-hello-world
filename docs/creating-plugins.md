@@ -21,41 +21,38 @@ The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contr
 Each public GitHub repository contains one plugin and these root files:
 
 ```text
-README.md          User-facing documentation shown before installation
-kiosk-plugin.json  Generated release descriptor
-manifest.json      Runtime manifest included in the package
-LICENSE            Plugin license included in the package
-src/               Plugin source
+README.md                     Documentation shown before installation
+kiosk-satellite-plugin.json   The single plugin manifest
+LICENSE                       Plugin license included in the package
+src/                          Plugin source
 ```
 
-The builder generates this descriptor from the runtime manifest and the completed ZIP:
+Build the plugin and attach these three files from `dist/` to a GitHub release:
 
-```json
-{
-  "schemaVersion": 1,
-  "manifest": { "...": "Full contents of manifest.json" },
-  "download": {
-    "tag": "v1.0.0",
-    "asset": "hello-world-1.0.0.zip",
-    "sha256": "64 lowercase hexadecimal characters"
-  }
-}
+```text
+kiosk-satellite-plugin.json
+<id>-<version>.zip
+<id>-<version>.zip.sha256
 ```
 
-Commit `kiosk-plugin.json` and `README.md` to the default branch. Create the named GitHub release and upload the exact ZIP. Tags and asset names start with a letter or digit and contain only letters, digits, periods, underscores or hyphens. They allow up to 151 characters. The asset ends in `.zip`.
+The attached manifest is an exact copy of the manifest inside the ZIP. It describes the plugin without release URLs or checksums. The ZIP filename comes from its `id` and `version`. The checksum file contains one line in `sha256sum` format: the 64 lowercase hexadecimal hash, two spaces and the ZIP filename.
 
-Kiosk resolves the default branch once and reads both files at that commit. The preview displays the manifest, compatibility and README without running code. A preview lasts 15 minutes. Installation downloads the named release asset, checks its required SHA-256 and compares the packaged manifest with the reviewed manifest. Repository metadata and the reviewed README are saved with the installed plugin for offline use. README HTML is sanitized in remote admin. The device renders Markdown without executable HTML. Links and images require HTTPS.
+Commit the source, manifest and README before creating the release tag. Tags start with a letter or digit and contain only letters, digits, periods, underscores or hyphens, up to 151 characters. Publish the release as the latest stable release. KS uses GitHub's latest release endpoint. Drafts and prereleases are excluded.
 
-The descriptor is limited to 32 KB and the README to 128 KB. Private repositories, GitHub tokens, automatic updates and custom registries are not supported yet. A repository cannot silently replace an installed plugin with the same ID from another repository. Uninstall first to change its source.
+KS reads the manifest and checksum attached to that release. It resolves the release tag to a commit and reads `README.md` at that commit, including the base for relative documentation links. Edits on the default branch do not change a released version's preview. The preview displays the manifest, compatibility and README without downloading or running plugin code.
 
-The release descriptor stays outside the package because including its package hash inside the ZIP would create a circular checksum. Rebuilds use fixed ZIP timestamps, but toolchain changes can still change DEX output. Always publish the exact package used to generate the descriptor.
+A preview lasts 15 minutes. Installation downloads the selected release's ZIP, checks its required SHA-256 and compares every field of the packaged manifest with the reviewed manifest. A newer release published during review does not change the approved download. Repository metadata, release tag, commit and reviewed README are saved for offline use. README HTML is sanitized in remote admin. The device renders Markdown without executable HTML. Links and images require HTTPS.
+
+The manifest is limited to 32 KB, the checksum file to 1 KB and the README to 128 KB. Private repositories, GitHub tokens, automatic updates and custom registries are not supported yet. A repository cannot silently replace an installed plugin with the same ID from another repository. Uninstall first to change its source.
+
+Rebuilds use fixed ZIP timestamps, but toolchain changes can still change DEX output. Upload the manifest, ZIP and checksum from the same build. Keep the checksum outside the ZIP to avoid a circular checksum. Publish a new version when changing a release package.
 
 ## Package
 
 A ZIP contains exactly these files at its root:
 
 ```text
-manifest.json
+kiosk-satellite-plugin.json
 plugin.jar
 LICENSE
 ```
@@ -66,7 +63,7 @@ The complete ZIP, expanded files and expanded DEX content each have a 4 MB limit
 
 ## Manifest
 
-See [manifest.json](../manifest.json) for a complete example.
+See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete example.
 
 | Field | Meaning |
 | --- | --- |

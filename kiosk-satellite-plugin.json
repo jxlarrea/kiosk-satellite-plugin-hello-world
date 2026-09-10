@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "hello-world",
+  "name": "Hello World",
+  "version": "1.0.1",
+  "apiVersion": 1,
+  "minAndroidSdk": 24,
+  "entryClass": "me.jxl.kiosk.plugins.hello.HelloWorldPlugin",
+  "description": "A floating greeting over the Home Assistant dashboard. Use this plugin as a starting point for your own.",
+  "author": "Kiosk Satellite contributors",
+  "license": "Apache-2.0",
+  "capabilities": [
+    "overlay"
+  ],
+  "settings": [
+    {
+      "key": "message",
+      "type": "string",
+      "title": "Greeting",
+      "default": "Hello from a Kiosk Satellite plugin!"
+    },
+    {
+      "key": "showOnStart",
+      "type": "boolean",
+      "title": "Show window when enabled",
+      "default": true
+    }
+  ],
+  "commands": [
+    {
+      "id": "show",
+      "title": "Show window"
+    },
+    {
+      "id": "hide",
+      "title": "Hide window"
+    }
+  ]
+}

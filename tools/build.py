@@ -15,7 +15,8 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('plugin', nargs='?', default=str(ROOT), help='Path to the plugin repository')
 args = parser.parse_args()
 plugin = Path(args.plugin).resolve()
-manifest = json.loads((plugin / 'manifest.json').read_text())
+manifest_bytes = (plugin / 'kiosk-satellite-plugin.json').read_bytes()
+manifest = json.loads(manifest_bytes)
 sdk_root = Path(os.environ.get('ANDROID_HOME', os.environ.get('ANDROID_SDK_ROOT', str(Path.home() / 'android-sdk'))))
 java_root = os.environ.get('JAVA_HOME')
 def java_tool(name):
@@ -49,15 +50,10 @@ with tempfile.TemporaryDirectory(prefix='kiosk-plugin-') as temp:
             add(archive, file.name, file.read_bytes())
     package = out / f"{manifest['id']}-{manifest['version']}.zip"
     with zipfile.ZipFile(package, 'w', zipfile.ZIP_DEFLATED) as archive:
-        add(archive, 'manifest.json', (plugin / 'manifest.json').read_bytes())
+        add(archive, 'kiosk-satellite-plugin.json', manifest_bytes)
         add(archive, 'plugin.jar', jar.read_bytes())
         add(archive, 'LICENSE', (plugin / 'LICENSE').read_bytes())
     digest = hashlib.sha256(package.read_bytes()).hexdigest()
     package.with_suffix('.zip.sha256').write_text(f'{digest}  {package.name}\n')
-    descriptor = {
-        'schemaVersion': 1,
-        'manifest': manifest,
-        'download': {'tag': f"v{manifest['version']}", 'asset': package.name, 'sha256': digest},
-    }
-    (plugin / 'kiosk-plugin.json').write_text(json.dumps(descriptor, indent=2) + '\n')
+    (out / 'kiosk-satellite-plugin.json').write_bytes(manifest_bytes)
     print(f'Package: {package}\nSHA-256: {digest}\nSDK: {sdk_jar}')
