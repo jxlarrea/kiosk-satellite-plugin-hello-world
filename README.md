@@ -15,6 +15,7 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
 - [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
+- [Charts](docs/charts.md): publish time-series data, inspect samples and update an existing plugin to use charts.
 - [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces supplied by Kiosk Satellite at runtime.
 - [Read-only example](examples/read-only): a buildable plugin that observes screen and screensaver state.
 
@@ -48,7 +49,7 @@ python3 tools/check-sdk.py /path/to/kiosk-satellite
 
 ## Hello World starter template
 
-Hello World opens a draggable greeting window over your Home Assistant dashboard. It demonstrates a floating view, configurable settings, a button counter and plugin actions that users can assign to gestures, the kiosk drawer or Home Assistant buttons.
+Hello World opens a draggable greeting window over your Home Assistant dashboard. It demonstrates every supported settings control, a live chart, a floating view, a button counter and plugin actions that users can assign to gestures, the kiosk drawer or Home Assistant buttons.
 
 Start with [HelloWorldPlugin.java](src/me/jxl/kiosk/plugins/hello/HelloWorldPlugin.java) and its [manifest](kiosk-satellite-plugin.json), then replace the greeting behavior with your own functionality.
 
@@ -64,6 +65,19 @@ The plugin runs trusted code inside Kiosk Satellite. It can access app data and 
 ### Try the template
 
 Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog.
+
+The settings are grouped into **Greeting window** and **Chart demo**. The chart uses simulated values, not device measurements. Its 120-sample history covers about four minutes and updates every two seconds while **Show demo chart** is on.
+
+| Control | Example |
+| --- | --- |
+| Text input | **Greeting** changes the floating window message |
+| Toggle | **Show window when enabled** opens the window on startup. **Show demo chart** shows or removes the chart |
+| Number slider | **Amplitude** changes the height of new simulated samples |
+| Selection | **Pattern** chooses a sine or triangle wave for new samples. **Chart size** switches between Regular and Mini |
+| Color picker | **Series color** changes the Wave line color |
+| Read-only chart | **Simulated activity** compares Wave and Reference with sample inspection in a full chart or compact sparkline |
+
+Chart settings take effect on the next sample. Tap or drag the chart to inspect a sample, or double-tap to follow the latest. See the [chart API](docs/charts.md) to replace the simulated values with your own measurements.
 
 **Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
 

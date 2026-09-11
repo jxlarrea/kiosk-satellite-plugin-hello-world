@@ -18,6 +18,9 @@
 
 ### Added
 
+- Add SDK 1 regular and mini chart publication and removal with bounded history, sample inspection and an existing-repository migration guide.
+- Expand Hello World to showcase every settings control, groups and a live simulated chart with a sampler that stops with its session.
+
 - Consolidate all features into the first public SDK 1. Document KS reads, passive events and transient controls and add a buildable screen and screensaver observer.
 - Add a release-triggered GitHub Actions build and document required Actions asset publication and developer-only ZIP testing.
 

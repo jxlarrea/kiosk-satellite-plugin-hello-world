@@ -168,6 +168,10 @@ Entity catalog changes reconnect ESPHome. State updates do not. Disabling a plug
 
 The Rockchip LED Control repository demonstrates these additions without putting a device driver into KS itself.
 
+## Charts
+
+Publish time-series data with `host.publishSeries(key, chart)` and remove it with `host.removeSeries(key)`. Charts are read-only runtime displays, separate from settings. They render in the plugin subpage on-device and in Remote Admin. No extra capability or SDK version is required. The [chart reference](charts.md) covers the schema, limits, lifecycle and steps for updating an existing repository. Hello World demonstrates every settings control alongside a live simulated chart.
+
 ## KS state and transient controls
 
 Declare `host.read` to inspect supported KS state and subscribe to passive events. Declare `host.control` for transient controls such as dismissing the screensaver or showing and hiding camera views and Now Playing. The [complete KS interaction reference](ks-api.md) lists every command, event, payload, capability and limit and includes a buildable example.

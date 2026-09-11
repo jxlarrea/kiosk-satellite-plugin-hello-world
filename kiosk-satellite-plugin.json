@@ -17,13 +17,69 @@
       "key": "message",
       "type": "string",
       "title": "Greeting",
-      "default": "Hello from a Kiosk Satellite plugin!"
+      "default": "Hello from a Kiosk Satellite plugin!",
+      "group": "Greeting window",
+      "description": "Text input: the message in the floating window."
     },
     {
       "key": "showOnStart",
       "type": "boolean",
       "title": "Show window when enabled",
-      "default": true
+      "default": true,
+      "group": "Greeting window",
+      "description": "Toggle: open the floating window when the plugin starts."
+    },
+    {
+      "key": "showChart",
+      "type": "boolean",
+      "title": "Show demo chart",
+      "default": true,
+      "group": "Chart demo",
+      "description": "Display simulated data in the plugin subpage."
+    },
+    {
+      "key": "chartSize",
+      "type": "select",
+      "title": "Chart size",
+      "default": "Regular",
+      "options": [
+        "Regular",
+        "Mini"
+      ],
+      "group": "Chart demo",
+      "description": "Use a full chart with axes or a compact sparkline."
+    },
+    {
+      "key": "amplitude",
+      "type": "number",
+      "title": "Amplitude",
+      "default": 60,
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "group": "Chart demo",
+      "description": "Slider: adjust the height of new simulated samples."
+    },
+    {
+      "key": "pattern",
+      "type": "select",
+      "title": "Pattern",
+      "default": "Sine",
+      "options": [
+        "Sine",
+        "Triangle"
+      ],
+      "group": "Chart demo",
+      "description": "Selection: choose the shape of new simulated samples."
+    },
+    {
+      "key": "seriesColor",
+      "type": "color",
+      "title": "Series color",
+      "default": "#1976D2",
+      "group": "Chart demo",
+      "description": "Color picker: set the Wave line color."
     }
   ],
   "commands": [

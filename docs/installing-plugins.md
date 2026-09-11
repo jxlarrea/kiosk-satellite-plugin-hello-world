@@ -64,6 +64,7 @@ The existing authenticated command API exposes these commands:
 
 | Command | Parameters |
 | --- | --- |
+| `getPluginCharts` | `id`: plugin ID. Returns current read-only chart snapshots |
 | `getPluginState` | None. Returns the master `enabled` flag and `plugins` list |
 | `setPluginsEnabled` | `enabled`: boolean master switch |
 | `listPlugins` | None. Returns the installed plugin list |

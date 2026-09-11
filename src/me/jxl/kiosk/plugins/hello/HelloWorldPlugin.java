@@ -1,33 +1,106 @@
 // SPDX-License-Identifier: Apache-2.0
 package me.jxl.kiosk.plugins.hello;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** A complete plugin with settings, commands and a window button event. */
+/** Settings controls, a floating window, actions and a read-only chart. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private PluginHost host;
     private String message;
     private boolean visible;
     private int greetings;
+    private boolean showChart;
+    private boolean compactChart;
+    private double amplitude;
+    private String pattern;
+    private String seriesColor;
+    private ScheduledExecutorService sampler;
+    private final List<Long> times = new ArrayList<>();
+    private final List<Double> wave = new ArrayList<>();
+    private final List<Double> reference = new ArrayList<>();
+    private int phase;
 
     @Override
-    public void start(PluginHost host, Map<String, Object> settings) {
+    public synchronized void start(PluginHost host, Map<String, Object> settings) {
         this.host = host;
         configure(settings);
         host.log("Hello World started");
+        host.status("Chart values are simulated demo data, not device measurements.", false);
         if (Boolean.TRUE.equals(settings.get("showOnStart"))) show();
+        // Seed a short simulated history so the chart is useful immediately.
+        long now = System.currentTimeMillis();
+        for (int i = 39; i >= 0; i--) sample(now - i * 2000L);
+        if (showChart) publishChart();
+        sampler = Executors.newSingleThreadScheduledExecutor(task -> {
+            Thread thread = new Thread(task, "hello-world-demo");
+            thread.setDaemon(true);
+            return thread;
+        });
+        sampler.scheduleWithFixedDelay(this::tick, 2, 2, TimeUnit.SECONDS);
     }
 
     @Override
-    public void configure(Map<String, Object> settings) {
+    public synchronized void configure(Map<String, Object> settings) {
         message = (String) settings.get("message");
+        boolean nextChart = Boolean.TRUE.equals(settings.get("showChart"));
+        if (showChart && !nextChart) host.removeSeries("demo");
+        showChart = nextChart;
+        compactChart = "Mini".equals(settings.get("chartSize"));
+        amplitude = ((Number) settings.get("amplitude")).doubleValue();
+        pattern = (String) settings.get("pattern");
+        seriesColor = (String) settings.get("seriesColor");
+        // The next tick publishes chart edits without creating extra update bursts.
         if (visible) show();
     }
 
+    private synchronized void tick() {
+        if (host == null || !showChart) return;
+        try {
+            long now = System.currentTimeMillis();
+            if (!times.isEmpty() && now <= times.get(times.size() - 1)) return;
+            sample(now);
+            publishChart();
+        } catch (RuntimeException error) {
+            host.status("Could not update the demo chart: " + error.getMessage(), true);
+        }
+    }
+
+    private void sample(long time) {
+        double position = (phase++ % 40) / 40.0;
+        double value = "Triangle".equals(pattern)
+            ? 1 - Math.abs(2 * position - 1)
+            : (Math.sin(position * Math.PI * 2) + 1) / 2;
+        times.add(time);
+        wave.add(amplitude * value);
+        reference.add(amplitude * .5);
+        if (times.size() > 120) { times.remove(0); wave.remove(0); reference.remove(0); }
+    }
+
+    private void publishChart() {
+        Map<String, Object> chart = new LinkedHashMap<>();
+        chart.put("title", "Simulated activity");
+        chart.put("unit", "%");
+        chart.put("compact", compactChart);
+        chart.put("timestamps", new ArrayList<>(times));
+        Map<String, Object> first = new LinkedHashMap<>();
+        first.put("name", "Wave"); first.put("color", seriesColor); first.put("values", new ArrayList<>(wave));
+        Map<String, Object> second = new LinkedHashMap<>();
+        second.put("name", "Reference"); second.put("values", new ArrayList<>(reference));
+        chart.put("series", Arrays.asList(first, second));
+        host.publishSeries("demo", chart);
+    }
+
     @Override
-    public void execute(String command, Map<String, Object> arguments) {
+    public synchronized void execute(String command, Map<String, Object> arguments) {
         if ("show".equals(command)) show();
         else if ("hide".equals(command)) {
             visible = false;
@@ -36,7 +109,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     }
 
     @Override
-    public void onEvent(String event, Map<String, Object> payload) {
+    public synchronized void onEvent(String event, Map<String, Object> payload) {
         if ("window.action".equals(event)) {
             greetings++;
             show();
@@ -49,10 +122,12 @@ public final class HelloWorldPlugin implements KioskPlugin {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
+        // KS revokes the host and removes its windows and charts before stop.
+        if (sampler != null) { sampler.shutdownNow(); sampler = null; }
+        times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;
-        host.hideWindow();
-        host.log("Hello World stopped");
+        showChart = false;
         host = null;
     }
 }
