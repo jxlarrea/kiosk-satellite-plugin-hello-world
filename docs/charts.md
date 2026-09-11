@@ -82,7 +82,7 @@ Avoid sampling on the Android main thread. KS lifecycle callbacks must still fin
 3. Keep `apiVersion: 1` in `kiosk-satellite-plugin.json`. Add calls to `host.publishSeries(...)` where your sampler publishes its history. Use `host.removeSeries(...)` when a running plugin intentionally hides a chart.
 4. Update test hosts to implement `publishSeries` and `removeSeries` if your tests exercise chart publication. Build and test with your repository's tools. The template uses `python3 tools/test.py` and `python3 tools/build.py`. If you have a KS source checkout, run `python3 tools/check-sdk.py /path/to/kiosk-satellite`.
 5. Test the local ZIP through **Plugin Manager > Developer Tools > Install from ZIP**. If the plugin is already installed from GitHub, use a separate development kiosk or uninstall it before switching sources. Uninstalling removes its settings.
-6. Increase your plugin's release version, commit the changes and publish a stable GitHub release tagged `v<version>`. Let the included GitHub Actions workflow build and attach the release assets. Users install or update through the repository URL.
+6. Commit the changes and publish a stable GitHub release tagged `v<version>` with the desired new version. The workflow uses the tag as the package version, so no source manifest version edit is required. Let the included GitHub Actions workflow build and attach the release assets. Users install or update through the repository URL.
 
 For renderer diagnostics, publish the timestamped CPU or main-thread activity readings you already collect. Label the metric according to what you measure. Renderer CPU busy time alone is not a frame duration or input latency measurement.
 

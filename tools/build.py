@@ -11,14 +11,19 @@ import tempfile
 import zipfile
 
 from android_sdk import android_platform
+from plugin_manifest import build_manifest
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('plugin', nargs='?', default=str(ROOT), help='Path to the plugin repository')
+parser.add_argument('--version', help='Package version override, normally supplied by the release tag')
 parser.add_argument('--android-platform', help='Installed platform version, for example 35 or 37.0')
 args = parser.parse_args()
 plugin = Path(args.plugin).resolve()
-manifest_bytes = (plugin / 'kiosk-satellite-plugin.json').read_bytes()
+try:
+    manifest_bytes = build_manifest(plugin / 'kiosk-satellite-plugin.json', args.version)
+except ValueError as error:
+    parser.error(str(error))
 manifest = json.loads(manifest_bytes)
 sdk_root = Path(os.environ.get('ANDROID_HOME', os.environ.get('ANDROID_SDK_ROOT', str(Path.home() / 'android-sdk'))))
 java_root = os.environ.get('JAVA_HOME')

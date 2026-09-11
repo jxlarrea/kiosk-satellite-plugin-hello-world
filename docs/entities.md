@@ -102,4 +102,4 @@ All values are simulated. See [HelloWorldPlugin.java](../src/me/jxl/kiosk/plugin
 3. Publish readings from your sampler with the methods above. Add `onEvent("select.KEY", payload)` handling only for writable selects. Update test hosts to implement the methods exercised by your tests.
 4. Build and test locally. Verify null readings, repeated updates and shutdown. For a select, also verify invalid-option rejection and the confirmed value after a change.
 5. Test the ZIP through **Developer Tools > Install from ZIP**. A GitHub-installed plugin must be uninstalled before switching to a local ZIP, which deletes its settings. A separate development kiosk avoids disturbing the installed copy.
-6. Increase the plugin version and publish a stable GitHub release. Let GitHub Actions build and attach the release assets for repository installation.
+6. Commit the changes and publish a stable GitHub release tagged `v<version>` with the desired new version. The workflow uses the tag as the package version without requiring a source manifest version edit. Let GitHub Actions build and attach the release assets for repository installation.

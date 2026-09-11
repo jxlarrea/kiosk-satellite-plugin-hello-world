@@ -43,13 +43,13 @@ kiosk-satellite-plugin.json
 <id>-<version>.zip.sha256
 ```
 
-Use `.github/workflows/build.yml` from this template. It builds on a published release or an explicit retry on an existing release tag, not on each commit. It compiles the tagged source on `ubuntu-24.04`, tests it and uploads with `${{ github.token }}`. The tag must match the manifest version, optionally prefixed by `v`. Keep all three assets from the same workflow build.
+Use `.github/workflows/build.yml` from this template. It builds on a published release or an explicit retry on an existing release tag, not on each commit. It compiles the tagged source on `ubuntu-24.04`, tests it and uploads with `${{ github.token }}`. The tag supplies the package version, optionally prefixed by `v`. The workflow passes it as `--version` to the builder, which uses it in both generated manifests and the ZIP filename. The source manifest keeps its local development version. When updating an existing workflow, also copy `tools/build.py`, `tools/android_sdk.py` and `tools/plugin_manifest.py` from the template so the builder supports the version argument. Keep all three assets from the same workflow build.
 
 KS requires GitHub's uploader identity to be `github-actions[bot]` for all three assets and checks the ZIP against both GitHub's asset digest and the release checksum. A manually attached ZIP, manifest or checksum is rejected. Uploading through a personal access token is also rejected. ZIP installation is a developer escape hatch for local testing and does not count as a verified repository release.
 
 This check establishes that GitHub Actions published the bytes. It does not cryptographically prove that the workflow compiled those bytes or ran on a GitHub-hosted runner. A repository owner can change workflow code, so users still need to review and trust the author. Full artifact attestation verification is not implemented. See GitHub's [release asset metadata](https://docs.github.com/en/rest/releases/assets) and [workflow token documentation](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication).
 
-The attached manifest is an exact copy of the manifest inside the ZIP. It describes the plugin without release URLs or checksums. The ZIP filename comes from its `id` and `version`. The checksum file contains one line in `sha256sum` format: the 64 lowercase hexadecimal hash, two spaces and the ZIP filename.
+The attached manifest is an exact copy of the generated manifest inside the ZIP. It describes the plugin without release URLs or checksums. The ZIP filename comes from its `id` and `version`. The checksum file contains one line in `sha256sum` format: the 64 lowercase hexadecimal hash, two spaces and the ZIP filename.
 
 Commit the source, manifest and README before creating the release tag. Tags start with a letter or digit and contain only letters, digits, periods, underscores or hyphens, up to 151 characters. Publish the release as the latest stable release. KS uses GitHub's latest release endpoint. Drafts and prereleases are excluded.
 
@@ -85,7 +85,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `apiVersion` | `1`, the first public SDK including all documented features |
 | `id` | Stable lowercase ID with optional hyphens, at most 64 characters |
 | `name` | Display name, at most 80 characters |
-| `version` | `major.minor.patch` with optional prerelease suffix |
+| `version` | Default local build version, formatted as `major.minor.patch` with optional prerelease suffix. Release builds override it from the tag |
 | `minAndroidSdk` | Android API level, at least `24` |
 | `entryClass` | Public class implementing `KioskPlugin` with a public no-argument constructor |
 | `description` | Plain text, at most 1000 characters |

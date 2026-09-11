@@ -16,3 +16,5 @@ with tempfile.TemporaryDirectory(prefix='kiosk-plugin-test-') as directory:
     subprocess.run([tool('java'), '-ea', '-cp', directory, 'HelloWorldTest'], check=True)
 
 subprocess.run([sys.executable, str(root / 'tools/test_android_sdk.py')], check=True)
+
+subprocess.run([sys.executable, str(root / 'tools/test_plugin_manifest.py')], check=True)

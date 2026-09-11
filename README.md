@@ -93,9 +93,11 @@ Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/e
 ## Publish your plugin
 
 1. Build and test locally during development.
-2. Commit the source, README and `kiosk-satellite-plugin.json`.
-3. Publish a stable GitHub release tagged `v<version>` at that commit. The included GitHub Actions workflow tests and builds the source and attaches the manifest, ZIP and checksum automatically. Wait for it to succeed before sharing the release.
+2. Commit the source, README and manifest. The manifest version is the default for local ZIP builds. It does not need to match the release tag. Keep `apiVersion: 1`.
+3. Publish a stable GitHub release tagged with the desired version, such as `v1.2.0`, at that commit. The included GitHub Actions workflow tests and builds the source and attaches the manifest, ZIP and checksum automatically. Wait for it to succeed before sharing the release.
 4. Share the public repository URL.
+
+The workflow takes the package version from the tag, removing an optional `v` prefix. It writes that version into both generated manifests and the ZIP filename without editing or committing the source manifest. The release title is only a display label. Local builds can also override the version with `python3 tools/build.py --version 1.2.0`.
 
 KS discovers the latest stable GitHub release, previews its attached manifest and reads the README from the tagged commit. It downloads the ZIP only after confirmation and verifies the checksum and packaged manifest. Drafts and prereleases are excluded.
 
