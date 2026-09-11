@@ -1,8 +1,20 @@
 # Plugin sensors, selects and switches
 
-SDK 1 plugins can expose numeric sensors, text sensors, binary sensors, selects and switches through the kiosk's existing ESPHome connection. Add `entities` to the manifest's capabilities. The kiosk must have ESPHome and native entities enabled and be connected to Home Assistant. Users can exclude individual plugin entities in the existing ESPHome entity picker.
+SDK 1 plugins can publish numeric sensors, text sensors, binary sensors, selects and switches. Add `entities` to the manifest's capabilities. Their current values appear automatically in **Readings** on the plugin subpage, both on-device and in Remote Admin. Local readings work without ESPHome or Home Assistant.
 
-Numeric, text and binary sensors are read-only. A **switch** is a writable boolean control. A **select** is a writable control with a fixed set of advertised options. Use a text sensor when a value such as the connection type is observed rather than chosen. Publishing an entity does not add a setting to the plugin subpage. Declare a setting separately if you want a local control too.
+To expose these entities to Home Assistant too, enable ESPHome and native entities in KS and connect Home Assistant. Users can exclude individual plugin entities in the ESPHome entity picker. Exclusions affect Home Assistant exposure and do not hide local readings.
+
+Numeric, text and binary sensors are read-only. A **switch** is a writable boolean control. A **select** is a writable control with a fixed set of advertised options. Use a text sensor when a value such as the connection type is observed rather than chosen. Readings are read-only, including the confirmed states of selects and switches. Publishing an entity does not add an editable setting to the plugin subpage. Declare a setting separately if you want a local control too.
+
+## Readings in the plugin subpage
+
+KS displays each published entity's name and current value in a rounded **Readings** section above charts and settings. Numeric readings respect `accuracyDecimals` and show their unit in quieter text. Booleans display **On** or **Off**. Selects show the confirmed option. A null state displays **No data** and an empty string displays **Empty**, so neither is confused with zero or false. Very large numbers use scientific notation.
+
+Text readings preserve line breaks and wrap long content. Use a multiline text sensor for short summaries such as a top-process list. Keep independent measurements in separate sensors so KS can align their labels, values and units. `host.status()` remains a short overall status or error message and preserves line breaks on both surfaces.
+
+Rows follow publication order. Updating a value does not reset a settings edit or chart selection. Removing an entity removes its row. Stopping or disabling the plugin clears its readings and an empty section is hidden. Values belong to the running session and are not persisted as history. Action buttons and RGB lights are not included in this scalar readings section.
+
+Existing plugins using these publication methods need no code changes to display readings. Update KS to a build with the Readings UI and keep `apiVersion: 1`. No new SDK methods or manifest fields are required. Hello World demonstrates numeric precision, units, boolean and select states and multiline text.
 
 ## Publish readings
 
@@ -136,3 +148,7 @@ All values are simulated. See [HelloWorldPlugin.java](../src/me/jxl/kiosk/plugin
 4. Build and test locally. Verify null readings, repeated updates and shutdown. For writable controls, also verify invalid-request rejection and the confirmed value after a change. Switches require known boolean states and deliver `false` as a valid off request.
 5. Test the ZIP through **Developer Tools > Install from ZIP**. A GitHub-installed plugin must be uninstalled before switching to a local ZIP, which deletes its settings. A separate development kiosk avoids disturbing the installed copy.
 6. Commit the changes and publish a stable GitHub release tagged `v<version>` with the desired new version. The workflow uses the tag as the package version without requiring a source manifest version edit. Let GitHub Actions build and attach the release assets for repository installation.
+
+## Remote Admin API
+
+Authenticated administrators can call `getPluginReadings` with `{"id": "plugin-id"}` to read the current list of scalar entities. Each entry includes `type`, `key`, `name`, `state` and the metadata accepted by its publication method. Names are the plugin's original labels, without the Home Assistant plugin-name prefix. The command returns an empty list for an unknown plugin or a session with no readings and never refreshes or modifies settings. Fleet credentials cannot call it.

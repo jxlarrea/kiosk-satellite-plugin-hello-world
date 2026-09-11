@@ -13,14 +13,17 @@ public final class HelloWorldTest {
         String status;
         boolean visible;
         volatile Double sensor;
+        volatile Double samples;
+        volatile String summary;
         volatile String text;
         volatile Boolean binary;
         volatile String selection;
         volatile boolean switchOn;
         public void publishSwitch(String key, String name, boolean state) { switchOn = state; }
         Map<String, Object> saved;
-        public void publishSensor(String key, String name, Map<String, Object> metadata, Double state) { sensor = state; assert "%".equals(metadata.get("unit")); }
-        public void publishTextSensor(String key, String name, String state) { text = state; }
+        public void publishSensor(String key, String name, Map<String, Object> metadata, Double state) { if ("wave".equals(key)) { sensor = state; assert "%".equals(metadata.get("unit")); }
+            else if ("samples".equals(key)) { samples = state; assert Integer.valueOf(0).equals(metadata.get("accuracyDecimals")); } }
+        public void publishTextSensor(String key, String name, String state) { if ("status".equals(key)) text = state; else if ("summary".equals(key)) summary = state; }
         public void publishBinarySensor(String key, String name, String deviceClass, Boolean state) { binary = state; }
         public void publishSelect(String key, String name, String[] options, String state) { selection = state; assert options.length == 2; }
         public void saveSettings(Map<String, Object> values) { saved = new HashMap<>(values); }
@@ -56,6 +59,8 @@ public final class HelloWorldTest {
             assert host.status.contains("simulated");
             assert "line".equals(host.chart.get("type"));
             assert host.switchOn;
+            assert host.samples == 40;
+            assert host.summary.equals("Pattern: Sine\nHistory: up to 120 samples\nInterval: 2 seconds");
             plugin.onEvent("switch.chart", Collections.singletonMap("on", false));
             assert !host.switchOn && !host.binary && host.chart == null && host.sensor == null;
             assert Boolean.FALSE.equals(host.saved.get("showChart"));
@@ -74,6 +79,7 @@ public final class HelloWorldTest {
             try { plugin.onEvent("select.pattern", Collections.singletonMap("option", "Unsafe")); throw new AssertionError("Invalid select accepted"); }
             catch (IllegalArgumentException expected) {}
             assert "Triangle".equals(host.selection);
+            assert host.summary.startsWith("Pattern: Triangle\n");
             assert ((List<?>) host.chart.get("timestamps")).size() >= 40;
             assert ((List<?>) host.chart.get("series")).size() == 2;
             plugin.onEvent("window.action", Collections.emptyMap());

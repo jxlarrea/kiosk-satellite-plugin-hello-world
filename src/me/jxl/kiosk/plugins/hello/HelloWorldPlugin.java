@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, actions and a read-only chart. */
+/** Settings controls, a floating window, actions, live readings and a read-only chart. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private PluginHost host;
     private Map<String, Object> savedSettings;
@@ -36,7 +36,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         this.host = host;
         configure(settings);
         host.log("Hello World started");
-        host.status("Chart values are simulated demo data, not device measurements.", false);
+        host.status("Readings and charts use simulated demo data, not device measurements.", false);
         if (Boolean.TRUE.equals(settings.get("showOnStart"))) show();
         // Seed a short simulated history so the chart is useful immediately.
         long now = System.currentTimeMillis();
@@ -101,6 +101,12 @@ public final class HelloWorldPlugin implements KioskPlugin {
         host.publishBinarySensor("chart_active", "Demo chart active", "", showChart);
         host.publishSwitch("chart", "Demo chart", showChart);
         host.publishSelect("pattern", "Demo pattern", new String[] {"Sine", "Triangle"}, pattern);
+        // The same entities appear as local readings, even without Home Assistant.
+        Map<String, Object> countMetadata = new LinkedHashMap<>();
+        countMetadata.put("accuracyDecimals", 0);
+        host.publishSensor("samples", "Samples in history", countMetadata, (double) times.size());
+        host.publishTextSensor("summary", "Sample details",
+            "Pattern: " + pattern + "\nHistory: up to 120 samples\nInterval: 2 seconds");
     }
 
     private void publishChart() {

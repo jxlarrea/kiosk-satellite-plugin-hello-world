@@ -173,7 +173,7 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `nativeLibraryPath(name)` | Verified per-session path to a packaged library matching the process ABI. Pass `rockchip_led` for `librockchip_led.so` |
 | `packagePath()` | Verified plugin DEX JAR path, for a plugin-owned helper |
 | `publishLight(key, name, effects, state)` | Registers or updates a plugin-owned RGB light. At most four lights, 24 effects per light and bounded names. See [RGB states](creating-plugins.md#rich-settings-and-hardware) |
-| `publishSensor`, `publishTextSensor`, `publishBinarySensor` | Publish read-only numeric, text or boolean states. See the [entity API](entities.md) for signatures, metadata and limits |
+| `publishSensor`, `publishTextSensor`, `publishBinarySensor` | Publish numeric, text or boolean readings shown on the plugin subpage and exposed through ESPHome. See the [entity API](entities.md) for signatures, metadata and limits |
 | `publishSwitch(key, name, state)` | Publish a writable switch with a confirmed boolean state. Commands arrive as `onEvent("switch.KEY", {"on": boolean})`. See the [entity API](entities.md#writable-switches) |
 | `publishSelect(key, name, options, state)` | Publish a writable select. Confirm applied changes by publishing its resulting state |
 | `removeSensor`, `removeTextSensor`, `removeBinarySensor`, `removeSelect`, `removeSwitch` | Remove the corresponding entity owned by the active session |

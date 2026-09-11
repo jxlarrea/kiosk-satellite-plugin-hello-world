@@ -4,6 +4,8 @@
 
 ### Added
 
+- Demonstrate live readings in KS with numeric values, confirmed states, a history sample count and multiline text. Document automatic display of existing SDK 1 entities without an ESPHome connection.
+
 - Document SDK 1 dashboard URL reads and change notifications, with component redaction and an updated read-only example.
 
 - Add SDK 1 writable switches with boolean commands and confirmed states. Hello World exposes its chart toggle and the entity guide documents the protocol limits and migration steps.
