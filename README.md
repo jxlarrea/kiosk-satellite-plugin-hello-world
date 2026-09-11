@@ -13,7 +13,7 @@ This plugin requires a Kiosk Satellite build with SDK 1 plugin support and Andro
 
 The master **Enable Plugins** switch pauses all plugins and closes their windows. It keeps each plugin's enabled choice and settings, so turning it back on resumes the selected plugins.
 
-Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Save settings to apply changes. **Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
+Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog. **Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
 
 The plugin runs trusted code inside Kiosk Satellite. It can access app data and granted Android permissions. Review the source before enabling it.
 
