@@ -18,7 +18,7 @@ The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contr
 
 ## Test a local build
 
-Use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
+For developer testing only, use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
 
 Local packages use the same 4 MB size limit, manifest validation and DEX checks as release packages. New plugins start disabled. To test another build, install the replacement ZIP directly. KS automatically stops running plugins and restores their enabled state after the update. A normal update does not require an app restart. Compatible settings are retained. A local ZIP cannot replace a plugin installed from GitHub. Uninstall that plugin first, which also deletes its settings.
 
@@ -33,13 +33,19 @@ LICENSE                       Plugin license included in the package
 src/                          Plugin source
 ```
 
-Build the plugin and attach these three files from `dist/` to a GitHub release:
+Publish a release from the tagged source and let the included GitHub Actions workflow build and attach these three files from `dist/`:
 
 ```text
 kiosk-satellite-plugin.json
 <id>-<version>.zip
 <id>-<version>.zip.sha256
 ```
+
+Use `.github/workflows/build.yml` from this template. It builds on a published release or an explicit retry on an existing release tag, not on each commit. It compiles the tagged source on `ubuntu-24.04`, tests it and uploads with `${{ github.token }}`. The tag must match the manifest version, optionally prefixed by `v`. Keep all three assets from the same workflow build.
+
+KS requires GitHub's uploader identity to be `github-actions[bot]` for all three assets and checks the ZIP against both GitHub's asset digest and the release checksum. A manually attached ZIP, manifest or checksum is rejected. Uploading through a personal access token is also rejected. ZIP installation is a developer escape hatch for local testing and does not count as a verified repository release.
+
+This check establishes that GitHub Actions published the bytes. It does not cryptographically prove that the workflow compiled those bytes or ran on a GitHub-hosted runner. A repository owner can change workflow code, so users still need to review and trust the author. Full artifact attestation verification is not implemented. See GitHub's [release asset metadata](https://docs.github.com/en/rest/releases/assets) and [workflow token documentation](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication).
 
 The attached manifest is an exact copy of the manifest inside the ZIP. It describes the plugin without release URLs or checksums. The ZIP filename comes from its `id` and `version`. The checksum file contains one line in `sha256sum` format: the 64 lowercase hexadecimal hash, two spaces and the ZIP filename.
 
@@ -74,7 +80,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | Field | Meaning |
 | --- | --- |
 | `schemaVersion` | Must be `1` |
-| `apiVersion` | `1` for the original SDK or `2` for native files and richer controls |
+| `apiVersion` | `1`, the first public SDK including all documented features |
 | `id` | Stable lowercase ID with optional hyphens, at most 64 characters |
 | `name` | Display name, at most 80 characters |
 | `version` | `major.minor.patch` with optional prerelease suffix |
@@ -83,7 +89,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `description` | Plain text, at most 1000 characters |
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
-| `capabilities` | `overlay` in SDK 1. SDK 2 also supports `native` and `entities` |
+| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read` and `host.control` |
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
 
@@ -91,7 +97,7 @@ A setting declares `key`, `title`, `type` and `default`. Types are `string` and 
 
 Settings and commands are scoped to the plugin ID. Do not change that ID after publication. Increasing a plugin's own version does not increase the SDK version.
 
-Declared commands are reusable actions. Users can select them in **Gestures > Run a plugin action**. The plugin subpage lets users opt each command into the kiosk drawer or expose it as an ESPHome button in Home Assistant. Settings configures those placements and does not run the command. These connections work with SDK 1 and SDK 2 without additional plugin capabilities.
+Declared commands are reusable actions. Users can select them in **Gestures > Run a plugin action**. The plugin subpage lets users opt each command into the kiosk drawer or expose it as an ESPHome button in Home Assistant. Settings configures those placements and does not run the command. These connections work with all supported SDK versions without additional plugin capabilities.
 
 Keep command IDs stable across releases. The host retains shortcut choices for commands that survive an update and removes choices for deleted commands. New commands start without drawer or Home Assistant exposure. Commands run through `execute` only while the plugin is running. A saved gesture targeting a disabled or missing plugin reports a failure. Plugins should use hardware entities such as RGB lights for ongoing stateful control and commands for individual operations.
 
@@ -104,10 +110,10 @@ Implement `me.jxl.kiosk.plugins.KioskPlugin`:
 | `start(host, settings)` | Save the host handle and acquire resources |
 | `configure(settings)` | Apply the complete validated configuration |
 | `execute(command, arguments)` | Run a declared command. SDK 1 passes an empty arguments map |
-| `onEvent(event, payload)` | Handle a window event. SDK 1 passes an empty payload map |
+| `onEvent(event, payload)` | Handle a window event, RGB command or subscribed KS event. See the [complete interaction reference](ks-api.md) |
 | `stop()` | Release timers, threads and resources |
 
-Callbacks run serially on a worker dedicated to the plugin. They must finish within three seconds. The host disables a plugin after a callback error or timeout. Keep long work asynchronous and honor interruption. Host calls are ignored after the plugin stops. A timed-out thread can keep running if it ignores interruption, since this runtime does not isolate plugin code.
+Callbacks run serially on a worker dedicated to the plugin. They must finish within three seconds. The host disables a plugin after a callback error or timeout. Keep long work asynchronous and honor interruption. Host access is revoked after the plugin stops. SDK 1 read and subscription calls made after revocation throw. A timed-out thread can keep running if it ignores interruption, since this runtime does not isolate plugin code.
 
 The host rejects settings with unknown keys or incorrect types. Defaults fill missing keys. First-time installation does not run plugin code and leaves the plugin disabled. Updates automatically stop the old session and restart the replacement if the plugin was enabled and the master switch is on. Disabled plugins stay disabled. Updates while the master switch is off retain the enabled choice without running code. The host calls `start` after explicit enable or at app startup for an enabled plugin while the master **Enable Plugins** switch is on. Turning the master switch off calls `stop` and revokes host callbacks without changing the plugin's saved enabled choice or settings. Turning it on starts the selected plugins again. An off master switch prevents startup and execution across app restarts.
 
@@ -133,13 +139,13 @@ The window floats over the dashboard and is draggable by its title bar. Other ki
 
 A plugin executes inside Kiosk Satellite with the application's identity. This is not a sandbox. The capabilities array identifies SDK requirements and does not restrict arbitrary Java code. Do not copy app implementation classes into your plugin or rely on internal classes discovered through reflection.
 
-SDK 1 does not expose app commands, Home Assistant credentials, hardware services, ESPHome entities or voice events through its API. Those APIs can be designed as later versioned capabilities. SDK 2 adds native library packaging and RGB entities. Repository updates are reviewed from the installed entry row.
+SDK 1 includes native libraries, RGB entities, explicit state queries, passive events and transient controls. See the [complete interaction reference](ks-api.md) for the exact contract and exclusions. Repository updates are reviewed from the installed entry row.
 
 Publish source code alongside release packages. A checksum detects changed bytes but does not authenticate a publisher. Users must trust the repository author. Plugin authors remain responsible for all licenses and notices included in their packages.
 
-## SDK 2
+## Rich settings and hardware
 
-The host still accepts SDK 1 packages. A package using the following additions must declare `apiVersion: 2`.
+These features are part of SDK 1. Declare `apiVersion: 1` and the capabilities your plugin needs.
 
 Settings can add `group` and `description` fields. A `number` setting declares finite `min`, `max`, `step` and a numeric default. Values must match that range and step. A `color` setting stores `#RRGGBB` and uses the app color picker. A `select` setting declares up to 32 unique string `options` and a default from that list. The same controls appear in the native app and Remote Admin.
 
@@ -159,3 +165,7 @@ RGB state contains `on`, `brightness`, `red`, `green`, `blue` and `effect`. Nume
 Entity catalog changes reconnect ESPHome. State updates do not. Disabling a plugin revokes its host and removes its entities. Plugin-owned threads and helper processes must stop before `stop()` returns. The three-second callback deadline still applies. Long permission prompts must happen on a plugin-owned worker that can be canceled during shutdown.
 
 The Rockchip LED Control repository demonstrates these additions without putting a device driver into KS itself.
+
+## KS state and transient controls
+
+Declare `host.read` to inspect supported KS state and subscribe to passive events. Declare `host.control` for transient controls such as dismissing the screensaver or showing and hiding camera views and Now Playing. The [complete KS interaction reference](ks-api.md) lists every command, event, payload, capability and limit and includes a buildable example.

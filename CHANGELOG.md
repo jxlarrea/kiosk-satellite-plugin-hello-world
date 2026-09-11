@@ -10,9 +10,12 @@
 
 ### Added
 
+- Consolidate all features into the first public SDK 1. Document KS reads, passive events and transient controls and add a buildable screen and screensaver observer.
+- Add a release-triggered GitHub Actions build and document required Actions asset publication and developer-only ZIP testing.
+
 - Document reusable plugin actions for gestures, optional drawer shortcuts and optional Home Assistant buttons.
 
-- Document SDK 2 native files, rich settings, runtime status and RGB entities and vendor backward-compatible host interfaces.
+- Document SDK 1 native files, rich settings, runtime status and RGB entities and vendor host interfaces.
 
 - Document the persistent Enable Plugins master switch, paused plugin behavior and state commands.
 - Document local ZIP testing through the Developer Tools group on the kiosk and remote admin.

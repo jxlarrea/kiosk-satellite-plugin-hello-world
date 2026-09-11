@@ -1,6 +1,6 @@
 # Plugin Manager
 
-Plugins add optional features to Kiosk Satellite. The first SDK supports a floating window over the dashboard, plugin settings and plugin commands. Each plugin lives in its own public GitHub repository. This repository contains the Hello World template, SDK, build tools and plugin documentation.
+Plugins add optional features to Kiosk Satellite. SDK 1 supports floating windows, plugin settings, reusable actions, hardware extensions, state observations and transient KS controls. Each plugin lives in its own public GitHub repository. This repository contains the Hello World template, SDK, build tools and plugin documentation.
 
 ## Install Hello World
 
@@ -34,7 +34,9 @@ Plugins start off on kiosks with no installed plugins. Upgrading a kiosk that al
 
 ## Developer Tools
 
-Choose **Install from ZIP** in the **Developer Tools** group to test a local plugin build. On the kiosk, select a file through Android's file picker. In remote admin, select a file from your computer. Review the filename and trust warning, then choose **Trust and install**. The package is validated before installation and starts disabled. Enable it from its entry row when ready.
+**Install from ZIP is for developers only.** Users install plugins through **Add plugin** using a public GitHub repository URL. Release assets must be built and published by the repository's GitHub Actions workflow. Manually attached release ZIPs are rejected.
+
+Developers can choose **Install from ZIP** in the **Developer Tools** group to test a local plugin build. On the kiosk, select a file through Android's file picker. In remote admin, select a file from your computer. Review the filename and trust warning, then choose **Trust and install**. The package is validated before installation and starts disabled. Enable it from its entry row when ready.
 
 ZIPs must be at most 4 MB and contain `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. Local installs do not need a GitHub release or a separate checksum file. They do not have a repository README. Install the replacement ZIP directly. KS stops the old session and restores its enabled state automatically. A normal update does not require an app restart. Compatible settings are retained. Uninstall a repository-installed plugin before switching to a local build. Uninstalling removes its settings.
 
@@ -54,7 +56,7 @@ The installer accepts ZIPs up to 4 MB and limits expanded content, including nes
 
 Repository installation discovers the latest stable GitHub release. It reads the attached `kiosk-satellite-plugin.json` and package checksum, then reads `README.md` from the release tag's commit. Drafts and prereleases are excluded. The ZIP contains the same `kiosk-satellite-plugin.json`. Default-branch edits do not change the released documentation. Previews expire after 15 minutes. Installation checks the downloaded bytes and packaged manifest against the preview. Another repository cannot replace an installed plugin with the same ID without uninstalling it first. The reviewed README, release tag and source revision are saved for offline viewing.
 
-Publisher signatures, private repositories, automatic background updates, hardware APIs and voice lifecycle subscriptions are not part of SDK 1. SDK 2 adds native library packaging and ESPHome RGB plugin entities. Plugin packages and settings are not included in Kiosk configuration export or fleet sync yet.
+KS checks that all release assets were uploaded by GitHub Actions and that the ZIP matches GitHub's asset digest. This checks publication through Actions and does not prove the workflow code is trustworthy. Full artifact attestation verification, private repositories and automatic background updates are not supported. SDK 1 includes native libraries, ESPHome RGB plugin entities and the [documented KS events and transient controls](ks-api.md). Plugin packages and settings are not included in Kiosk configuration export or fleet sync yet.
 
 ## Remote API
 
@@ -67,7 +69,7 @@ The existing authenticated command API exposes these commands:
 | `listPlugins` | None. Returns the installed plugin list |
 | `previewPluginRepository` | `url`: public GitHub repository URL |
 | `checkPluginUpdate` | `id` |
-| `installPlugin` | `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
+| `installPlugin` | Developer testing only. `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
 | `installPluginRepository` | `previewId`: returned by preview, `trusted`: true |
 | `enablePlugin` | `id` |
 | `disablePlugin` | `id` |
