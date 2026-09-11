@@ -99,6 +99,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         host.publishSensor("wave", "Simulated wave", metadata, value);
         host.publishTextSensor("status", "Demo status", showChart ? "Chart running" : "Chart hidden");
         host.publishBinarySensor("chart_active", "Demo chart active", "", showChart);
+        host.publishSwitch("chart", "Demo chart", showChart);
         host.publishSelect("pattern", "Demo pattern", new String[] {"Sine", "Triangle"}, pattern);
     }
 
@@ -132,7 +133,14 @@ public final class HelloWorldPlugin implements KioskPlugin {
             greetings++;
             show();
         } else if ("window.closed".equals(event)) visible = false;
-        else if ("select.pattern".equals(event)) {
+        else if ("switch.chart".equals(event)) {
+            Object on = payload.get("on");
+            if (!(on instanceof Boolean)) throw new IllegalArgumentException("Chart switch requires a boolean");
+            Map<String, Object> next = new LinkedHashMap<>(savedSettings);
+            next.put("showChart", on);
+            configure(next);
+            host.saveSettings(next);
+        } else if ("select.pattern".equals(event)) {
             Object option = payload.get("option");
             if (!"Sine".equals(option) && !"Triangle".equals(option)) throw new IllegalArgumentException("Unknown pattern");
             Map<String, Object> next = new LinkedHashMap<>(savedSettings);

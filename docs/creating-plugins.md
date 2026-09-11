@@ -168,9 +168,9 @@ Entity catalog changes reconnect ESPHome. State updates do not. Disabling a plug
 
 The Rockchip LED Control repository demonstrates these additions without putting a device driver into KS itself.
 
-## Sensors and selects
+## Sensors, selects and switches
 
-The `entities` capability also supports numeric sensors, text sensors, binary sensors and writable selects. See the [entity API](entities.md) for signatures, metadata, lifecycle rules and migration steps. Hello World demonstrates all four with simulated readings and a select that updates its own Pattern setting.
+The `entities` capability also supports numeric sensors, text sensors, binary sensors, writable selects and switches. See the [entity API](entities.md) for signatures, metadata, lifecycle rules and migration steps. Hello World demonstrates all five with simulated readings, a select for its Pattern setting and a switch for Show demo chart.
 
 ## Charts
 

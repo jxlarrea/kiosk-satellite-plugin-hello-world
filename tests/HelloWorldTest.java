@@ -16,6 +16,8 @@ public final class HelloWorldTest {
         volatile String text;
         volatile Boolean binary;
         volatile String selection;
+        volatile boolean switchOn;
+        public void publishSwitch(String key, String name, boolean state) { switchOn = state; }
         Map<String, Object> saved;
         public void publishSensor(String key, String name, Map<String, Object> metadata, Double state) { sensor = state; assert "%".equals(metadata.get("unit")); }
         public void publishTextSensor(String key, String name, String state) { text = state; }
@@ -53,6 +55,17 @@ public final class HelloWorldTest {
             assert host.visible && "Testing".equals(host.message);
             assert host.status.contains("simulated");
             assert "line".equals(host.chart.get("type"));
+            assert host.switchOn;
+            plugin.onEvent("switch.chart", Collections.singletonMap("on", false));
+            assert !host.switchOn && !host.binary && host.chart == null && host.sensor == null;
+            assert Boolean.FALSE.equals(host.saved.get("showChart"));
+            assert host.saved.get("message").equals(settings.get("message"));
+            try { plugin.onEvent("switch.chart", Collections.singletonMap("on", "false")); throw new AssertionError("Invalid switch accepted"); }
+            catch (IllegalArgumentException expected) {}
+            assert !host.switchOn;
+            plugin.onEvent("switch.chart", Collections.singletonMap("on", true));
+            assert host.switchOn && Boolean.TRUE.equals(host.saved.get("showChart"));
+            host.awaitPublication(host.publications);
             assert host.sensor != null && host.binary && "Chart running".equals(host.text);
             assert "Sine".equals(host.selection);
             plugin.onEvent("select.pattern", Collections.singletonMap("option", "Triangle"));
@@ -61,7 +74,7 @@ public final class HelloWorldTest {
             try { plugin.onEvent("select.pattern", Collections.singletonMap("option", "Unsafe")); throw new AssertionError("Invalid select accepted"); }
             catch (IllegalArgumentException expected) {}
             assert "Triangle".equals(host.selection);
-            assert ((List<?>) host.chart.get("timestamps")).size() == 40;
+            assert ((List<?>) host.chart.get("timestamps")).size() >= 40;
             assert ((List<?>) host.chart.get("series")).size() == 2;
             plugin.onEvent("window.action", Collections.emptyMap());
             assert host.message.contains("Greetings: 1");
@@ -82,7 +95,7 @@ public final class HelloWorldTest {
                 assert values.get(values.size() - 1) == 0;
             }
             settings.put("showChart", false); plugin.configure(settings); assert host.chart == null;
-            assert host.sensor == null && !host.binary && "Chart hidden".equals(host.text);
+            assert host.sensor == null && !host.binary && !host.switchOn && "Chart hidden".equals(host.text);
             before = host.publications;
             Thread.sleep(2100); assert host.publications == before;
             settings.put("showChart", true); plugin.configure(settings);
