@@ -12,6 +12,16 @@ public final class HelloWorldTest {
         String message;
         String status;
         boolean visible;
+        volatile Double sensor;
+        volatile String text;
+        volatile Boolean binary;
+        volatile String selection;
+        Map<String, Object> saved;
+        public void publishSensor(String key, String name, Map<String, Object> metadata, Double state) { sensor = state; assert "%".equals(metadata.get("unit")); }
+        public void publishTextSensor(String key, String name, String state) { text = state; }
+        public void publishBinarySensor(String key, String name, String deviceClass, Boolean state) { binary = state; }
+        public void publishSelect(String key, String name, String[] options, String state) { selection = state; assert options.length == 2; }
+        public void saveSettings(Map<String, Object> values) { saved = new HashMap<>(values); }
         volatile int publications;
         volatile Map<String, Object> chart;
         public void showWindow(String title, String message, String button) {
@@ -36,12 +46,21 @@ public final class HelloWorldTest {
         HelloWorldPlugin plugin = new HelloWorldPlugin();
         Map<String, Object> settings = new HashMap<>();
         settings.put("message", "Testing"); settings.put("showOnStart", true);
-        settings.put("showChart", true); settings.put("amplitude", 60); settings.put("chartSize", "Regular");
+        settings.put("showChart", true); settings.put("amplitude", 60); settings.put("chartSize", "Regular"); settings.put("chartType", "Line");
         settings.put("pattern", "Sine"); settings.put("seriesColor", "#1976D2");
         try {
             plugin.start(host, settings);
             assert host.visible && "Testing".equals(host.message);
             assert host.status.contains("simulated");
+            assert "line".equals(host.chart.get("type"));
+            assert host.sensor != null && host.binary && "Chart running".equals(host.text);
+            assert "Sine".equals(host.selection);
+            plugin.onEvent("select.pattern", Collections.singletonMap("option", "Triangle"));
+            assert "Triangle".equals(host.selection) && "Triangle".equals(host.saved.get("pattern"));
+            assert host.saved.get("message").equals(settings.get("message"));
+            try { plugin.onEvent("select.pattern", Collections.singletonMap("option", "Unsafe")); throw new AssertionError("Invalid select accepted"); }
+            catch (IllegalArgumentException expected) {}
+            assert "Triangle".equals(host.selection);
             assert ((List<?>) host.chart.get("timestamps")).size() == 40;
             assert ((List<?>) host.chart.get("series")).size() == 2;
             plugin.onEvent("window.action", Collections.emptyMap());
@@ -50,11 +69,12 @@ public final class HelloWorldTest {
             assert host.message.startsWith("Updated");
             plugin.execute("hide", Collections.emptyMap()); assert !host.visible;
             plugin.execute("show", Collections.emptyMap()); assert host.visible;
-            settings.put("chartSize", "Mini");
+            settings.put("chartSize", "Mini"); settings.put("chartType", "Bar");
             settings.put("amplitude", 0); settings.put("pattern", "Triangle"); settings.put("seriesColor", "#FF0000");
             plugin.configure(settings);
             int before = host.publications; host.awaitPublication(before);
             assert Boolean.TRUE.equals(host.chart.get("compact"));
+            assert "bar".equals(host.chart.get("type"));
             List<Map<String, Object>> series = (List<Map<String, Object>>) host.chart.get("series");
             assert "#FF0000".equals(series.get(0).get("color"));
             for (Map<String, Object> item : series) {
@@ -62,6 +82,7 @@ public final class HelloWorldTest {
                 assert values.get(values.size() - 1) == 0;
             }
             settings.put("showChart", false); plugin.configure(settings); assert host.chart == null;
+            assert host.sensor == null && !host.binary && "Chart hidden".equals(host.text);
             before = host.publications;
             Thread.sleep(2100); assert host.publications == before;
             settings.put("showChart", true); plugin.configure(settings);

@@ -15,7 +15,8 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
 - [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
-- [Charts](docs/charts.md): publish time-series data, inspect samples and update an existing plugin to use charts.
+- [Charts](docs/charts.md): publish line and bar charts, inspect samples and update an existing plugin to use charts.
+- [Sensors and selects](docs/entities.md): publish readings to Home Assistant and handle a writable selection.
 - [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces supplied by Kiosk Satellite at runtime.
 - [Read-only example](examples/read-only): a buildable plugin that observes screen and screensaver state.
 
@@ -73,15 +74,21 @@ The settings are grouped into **Greeting window** and **Chart demo**. The chart 
 | Text input | **Greeting** changes the floating window message |
 | Toggle | **Show window when enabled** opens the window on startup. **Show demo chart** shows or removes the chart |
 | Number slider | **Amplitude** changes the height of new simulated samples |
-| Selection | **Pattern** chooses a sine or triangle wave for new samples. **Chart size** switches between Regular and Mini |
-| Color picker | **Series color** changes the Wave line color |
-| Read-only chart | **Simulated activity** compares Wave and Reference with sample inspection in a full chart or compact sparkline |
+| Selection | **Pattern** chooses a sine or triangle wave for new samples. **Chart type** switches between Line and Bar. **Chart size** switches between Regular and Mini |
+| Color picker | **Series color** changes the Wave series color |
+| Read-only chart | **Simulated activity** compares Wave and Reference with sample inspection as lines or grouped bars in regular and mini layouts |
 
 Chart settings take effect on the next sample. Tap or drag the chart to inspect a sample, or double-tap to follow the latest. See the [chart API](docs/charts.md) to replace the simulated values with your own measurements.
 
 **Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
 
 The master **Enable Plugins** switch pauses all plugins and closes their windows. It keeps each plugin's enabled choice and settings, so turning it back on resumes the selected plugins.
+
+### Try the Home Assistant entities
+
+With ESPHome and native entities enabled in KS, Hello World also exposes **Simulated wave** as a numeric sensor, **Demo status** as a text sensor, **Demo chart active** as a binary sensor and **Demo pattern** as a select. The numeric value follows the chart and becomes unknown when the chart is hidden. Changing Demo pattern in Home Assistant updates the plugin's Pattern setting and its next samples. All readings are simulated.
+
+Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/entities.md) explains how to publish your own readings and handle select requests.
 
 ## Publish your plugin
 

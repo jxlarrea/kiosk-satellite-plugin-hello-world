@@ -1,6 +1,6 @@
 # Plugin interactions with Kiosk Satellite
 
-SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, manage files or change permissions. Plugin-owned windows, settings, charts, actions and RGB lights are also supported.
+SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects and RGB lights are also supported.
 
 ## Capabilities
 
@@ -11,7 +11,7 @@ Every plugin declares `"apiVersion": 1`. All features below belong to that singl
 | `overlay` | Show or update the plugin's floating window |
 | None | Hide its window, log, publish runtime status and charts, save its own settings and receive declared actions |
 | `native` | Locate its verified packaged JNI library and DEX container |
-| `entities` | Publish and remove its own RGB lights |
+| `entities` | Publish and remove its own RGB lights, sensors and selects |
 | `host.read` | Execute read commands and subscribe to passive events |
 | `host.control` | Execute the transient controls listed below |
 
@@ -171,6 +171,10 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `nativeLibraryPath(name)` | Verified per-session path to a packaged library matching the process ABI. Pass `rockchip_led` for `librockchip_led.so` |
 | `packagePath()` | Verified plugin DEX JAR path, for a plugin-owned helper |
 | `publishLight(key, name, effects, state)` | Registers or updates a plugin-owned RGB light. At most four lights, 24 effects per light and bounded names. See [RGB states](creating-plugins.md#rich-settings-and-hardware) |
+| `publishSensor`, `publishTextSensor`, `publishBinarySensor` | Publish read-only numeric, text or boolean states. See the [entity API](entities.md) for signatures, metadata and limits |
+| `publishSelect(key, name, options, state)` | Publish a writable select. Confirm applied changes by publishing its resulting state |
+| `removeSensor`, `removeTextSensor`, `removeBinarySensor`, `removeSelect` | Remove the corresponding entity owned by the active session |
+| `onEvent("select.KEY", payload)` | A request for an advertised select option, passed as `option`. No automatic setting write or optimistic state change |
 | `removeLight(key)` | Removes the plugin-owned light |
 | `start(host, settings)` | Receives the host and validated settings when the plugin starts |
 | `configure(settings)` | Receives validated saved settings changes |

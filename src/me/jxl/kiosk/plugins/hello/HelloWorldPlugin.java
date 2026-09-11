@@ -15,11 +15,13 @@ import me.jxl.kiosk.plugins.PluginHost;
 /** Settings controls, a floating window, actions and a read-only chart. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private PluginHost host;
+    private Map<String, Object> savedSettings;
     private String message;
     private boolean visible;
     private int greetings;
     private boolean showChart;
     private boolean compactChart;
+    private String chartType;
     private double amplitude;
     private String pattern;
     private String seriesColor;
@@ -40,6 +42,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         long now = System.currentTimeMillis();
         for (int i = 39; i >= 0; i--) sample(now - i * 2000L);
         if (showChart) publishChart();
+        publishEntities();
         sampler = Executors.newSingleThreadScheduledExecutor(task -> {
             Thread thread = new Thread(task, "hello-world-demo");
             thread.setDaemon(true);
@@ -50,16 +53,19 @@ public final class HelloWorldPlugin implements KioskPlugin {
 
     @Override
     public synchronized void configure(Map<String, Object> settings) {
+        savedSettings = new LinkedHashMap<>(settings);
         message = (String) settings.get("message");
         boolean nextChart = Boolean.TRUE.equals(settings.get("showChart"));
         if (showChart && !nextChart) host.removeSeries("demo");
         showChart = nextChart;
+        chartType = "Bar".equals(settings.get("chartType")) ? "bar" : "line";
         compactChart = "Mini".equals(settings.get("chartSize"));
         amplitude = ((Number) settings.get("amplitude")).doubleValue();
         pattern = (String) settings.get("pattern");
         seriesColor = (String) settings.get("seriesColor");
         // The next tick publishes chart edits without creating extra update bursts.
         if (visible) show();
+        publishEntities();
     }
 
     private synchronized void tick() {
@@ -69,6 +75,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
             if (!times.isEmpty() && now <= times.get(times.size() - 1)) return;
             sample(now);
             publishChart();
+            publishEntities();
         } catch (RuntimeException error) {
             host.status("Could not update the demo chart: " + error.getMessage(), true);
         }
@@ -85,11 +92,22 @@ public final class HelloWorldPlugin implements KioskPlugin {
         if (times.size() > 120) { times.remove(0); wave.remove(0); reference.remove(0); }
     }
 
+    private void publishEntities() {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("unit", "%"); metadata.put("stateClass", "measurement"); metadata.put("accuracyDecimals", 2);
+        Double value = showChart && !wave.isEmpty() ? wave.get(wave.size() - 1) : null;
+        host.publishSensor("wave", "Simulated wave", metadata, value);
+        host.publishTextSensor("status", "Demo status", showChart ? "Chart running" : "Chart hidden");
+        host.publishBinarySensor("chart_active", "Demo chart active", "", showChart);
+        host.publishSelect("pattern", "Demo pattern", new String[] {"Sine", "Triangle"}, pattern);
+    }
+
     private void publishChart() {
         Map<String, Object> chart = new LinkedHashMap<>();
         chart.put("title", "Simulated activity");
         chart.put("unit", "%");
         chart.put("compact", compactChart);
+        chart.put("type", chartType);
         chart.put("timestamps", new ArrayList<>(times));
         Map<String, Object> first = new LinkedHashMap<>();
         first.put("name", "Wave"); first.put("color", seriesColor); first.put("values", new ArrayList<>(wave));
@@ -114,6 +132,14 @@ public final class HelloWorldPlugin implements KioskPlugin {
             greetings++;
             show();
         } else if ("window.closed".equals(event)) visible = false;
+        else if ("select.pattern".equals(event)) {
+            Object option = payload.get("option");
+            if (!"Sine".equals(option) && !"Triangle".equals(option)) throw new IllegalArgumentException("Unknown pattern");
+            Map<String, Object> next = new LinkedHashMap<>(savedSettings);
+            next.put("pattern", option);
+            configure(next);
+            host.saveSettings(next);
+        }
     }
 
     private void show() {
@@ -123,7 +149,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
 
     @Override
     public synchronized void stop() {
-        // KS revokes the host and removes its windows and charts before stop.
+        // KS revokes the host and removes its windows, charts and entities before stop.
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;

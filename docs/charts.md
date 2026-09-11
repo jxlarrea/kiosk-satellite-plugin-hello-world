@@ -1,6 +1,6 @@
 # Plugin charts
 
-SDK 1 plugins can publish read-only line charts in their own subpage. Kiosk Satellite renders the same data on-device and in Remote Admin, with a title, legend, units, time labels and sample inspection. Charts are separate from saved settings and floating windows.
+SDK 1 plugins can publish read-only line and bar charts in their own subpage. Kiosk Satellite renders the same data on-device and in Remote Admin, with a title, legend, units, time labels and sample inspection. Charts are separate from saved settings and floating windows.
 
 Hello World is a complete [working example](../src/me/jxl/kiosk/plugins/hello/HelloWorldPlugin.java). Its text, toggle, number, selection and color settings demonstrate every supported settings control. The chart shows simulated data and requires no device probes or extra permissions.
 
@@ -29,13 +29,14 @@ host.publishSeries("renderer_cpu", chart);
 
 Each call replaces the entire chart at that key. Keep your history in a bounded buffer in the plugin and publish a copy. KS copies and validates the input synchronously, so changing your lists after a successful call cannot change the published chart.
 
-Use multiple series to compare readings with the same unit. Use separate charts for different units, such as CPU percentage and memory in MB. Series are connected with straight lines. There is no smoothing, resampling or interpolation across missing readings.
+Use multiple series to compare readings with the same unit. Use separate charts for different units, such as CPU percentage and memory in MB. Line charts connect series with straight lines. There is no smoothing, resampling or interpolation across missing readings.
 
 | Field | Contract |
 | --- | --- |
 | `key` argument | Stable chart ID matching `[a-z][a-z0-9_]{0,39}`. Scoped to the plugin |
 | `title` | Required string, 1 to 80 characters |
 | `unit` | Optional string, at most 16 characters. Defaults to no unit |
+| `type` | Optional `"line"` or `"bar"`. Defaults to `"line"` |
 | `compact` | Optional boolean. `true` renders a mini chart with a 56-pixel plot and no axes. Defaults to `false` for the full 160-pixel plot |
 | `timestamps` | Required list of up to 240 integer Unix timestamps in milliseconds, strictly increasing. Range 0 to 253402300799999 |
 | `series` | Required list of 1 to 4 series sharing those timestamps |
@@ -43,11 +44,21 @@ Use multiple series to compare readings with the same unit. Use separate charts 
 | Series `color` | Optional `#RRGGBB` string. KS uses its chart palette when omitted |
 | Series `values` | Required list with exactly one entry per timestamp. Each entry is a finite number between -1e12 and 1e12 or `null` for a gap |
 
-Only the listed fields are accepted. Labels are plain text. HTML, SVG and image payloads are not part of this API. Empty timestamps with empty value lists show a waiting state. All-null data shows no readings. A single sample renders as a point and constant values receive a usable vertical range.
+Only the listed fields are accepted. Labels are plain text. HTML, SVG and image payloads are not part of this API. Empty timestamps with empty value lists show a waiting state. All-null data shows no readings. A single sample renders as a point or bar and constant values receive a usable vertical range.
+
+## Bar charts
+
+Add `chart.put("type", "bar")` to draw vertical bars. Use `"line"` or omit the field for lines. The timestamps, series and limits stay the same, and the type can change on an existing chart key.
+
+Bars for different series sit side by side at each timestamp. They are not stacked. The time axis preserves the spacing between timestamps. KS reserves space at both edges and sizes groups using the shortest interval so adjacent groups do not overlap. For dense histories, publish fewer samples or aggregate them in your plugin for wider bars.
+
+The vertical range always includes zero. Positive bars extend upward and negative bars extend downward from the zero baseline. Null readings leave an empty slot and zero readings have a thin baseline marker. Tapping, dragging, hovering and keyboard inspection work as they do for lines. These are timestamped charts, not categorical charts with arbitrary horizontal labels.
+
+Hello World's **Chart type** selector switches between **Line** and **Bar**. Combine it with **Chart size** to try full and mini bar charts.
 
 ## Mini charts
 
-Add `chart.put("compact", true)` to use a compact sparkline. It keeps the title, series legend, current values and sample inspection but hides the axes and instructional text. Use `false` or omit the field for a regular chart. Both layouts use the same data format and limits and can be changed by publishing another snapshot at the same key.
+Add `chart.put("compact", true)` to use a compact chart. Line charts render as sparklines and bar charts render as mini bars. It keeps the title, series legend, current values and sample inspection but hides the axes and instructional text. Use `false` or omit the field for a regular chart. Both layouts use the same data format and limits and can be changed by publishing another snapshot at the same key.
 
 Hello World's **Chart size** selector switches between **Regular** and **Mini** so you can try both presentations.
 

@@ -10,7 +10,8 @@
   "author": "Kiosk Satellite contributors",
   "license": "Apache-2.0",
   "capabilities": [
-    "overlay"
+    "overlay",
+    "entities"
   ],
   "settings": [
     {
@@ -38,6 +39,18 @@
       "description": "Display simulated data in the plugin subpage."
     },
     {
+      "key": "chartType",
+      "type": "select",
+      "title": "Chart type",
+      "default": "Line",
+      "options": [
+        "Line",
+        "Bar"
+      ],
+      "group": "Chart demo",
+      "description": "Display samples as lines or grouped bars."
+    },
+    {
       "key": "chartSize",
       "type": "select",
       "title": "Chart size",
@@ -47,7 +60,7 @@
         "Mini"
       ],
       "group": "Chart demo",
-      "description": "Use a full chart with axes or a compact sparkline."
+      "description": "Use a full chart with axes or a compact mini chart."
     },
     {
       "key": "amplitude",
@@ -79,7 +92,7 @@
       "title": "Series color",
       "default": "#1976D2",
       "group": "Chart demo",
-      "description": "Color picker: set the Wave line color."
+      "description": "Color picker: set the Wave series color."
     }
   ],
   "commands": [

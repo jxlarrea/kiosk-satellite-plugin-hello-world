@@ -18,6 +18,11 @@
 
 ### Added
 
+- Support SDK 1 grouped bar charts in regular and mini layouts and add a Chart type selector to Hello World.
+
+- Add SDK 1 numeric, text and binary sensors plus writable selects, with validated metadata, unknown readings and confirmed select callbacks.
+- Demonstrate all four entity types in Hello World and document repository update steps.
+
 - Add SDK 1 regular and mini chart publication and removal with bounded history, sample inspection and an existing-repository migration guide.
 - Expand Hello World to showcase every settings control, groups and a live simulated chart with a sampler that stops with its session.
 
