@@ -6,7 +6,7 @@
   </picture>
 </h1>
 
-This repository contain the Kiosk Satellite plugin SDK, documentation and getting started guides. Learn how plugins work, build community features and publish a plugin from your own GitHub repository. It also includes **Hello World**, a working starter template with a floating window over the Home Assistant dashboard.
+This repository contains the [Kiosk Satellite](https://github.com/jxlarrea/kiosk-satellite) plugin SDK, documentation and getting started guides. Learn how plugins work, build community features and publish a plugin from your own GitHub repository. It also includes **Hello World**, a working starter template with a floating window over the Home Assistant dashboard.
 
 All documented features use **SDK 1**, the first public plugin SDK. Plugins require a Kiosk Satellite build with SDK 1 support and Android 7.0 or newer.
 
