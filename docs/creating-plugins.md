@@ -12,6 +12,8 @@ python3 tools/build.py
 python3 tools/check-sdk.py /path/to/kiosk-satellite
 ```
 
+Release builds pass `--android-platform 35` to use the platform installed by the workflow, regardless of newer platforms already on the runner. Local builds can pass the same option or omit it to choose the highest installed numeric platform version, including dotted names such as `37.0`. Preview and extension directory names are skipped during automatic selection.
+
 The SDK check compares this repository's interfaces and license with the application's copy. Keep the SDK as a compile-time dependency. The application supplies those interfaces at runtime.
 
 The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contributors retain copyright to their work and contribute under the license of the component they change. Plugins may choose their own license and must retain any required third-party notices.

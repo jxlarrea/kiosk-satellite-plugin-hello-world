@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise Hello World against the SDK without a device."""
 import os
+import sys
 from pathlib import Path
 import subprocess
 import tempfile
@@ -13,3 +14,5 @@ sources = [*sorted((root / 'sdk/src').rglob('*.java')), *sorted((root / 'src').r
 with tempfile.TemporaryDirectory(prefix='kiosk-plugin-test-') as directory:
     subprocess.run([tool('javac'), '--release', '8', '-d', directory, *map(str, sources)], check=True)
     subprocess.run([tool('java'), '-ea', '-cp', directory, 'HelloWorldTest'], check=True)
+
+subprocess.run([sys.executable, str(root / 'tools/test_android_sdk.py')], check=True)

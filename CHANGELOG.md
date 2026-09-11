@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- Handle dotted Android platform directories such as `android-37.0` without crashing. Release builds explicitly select Android 35 and tests cover mixed platform installations.
+
 ### Changed
 
 - Document automatic setting saves and the on-device text edit dialog.
