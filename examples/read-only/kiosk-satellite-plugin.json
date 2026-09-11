@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "minAndroidSdk": 24,
   "entryClass": "example.kiosk.ReadOnlyPlugin",
-  "description": "Observe the screen and screensaver without changing them. Their current state appears below and updates while this plugin is running.",
+  "description": "Observe the screen, screensaver and current dashboard path without changing them. Their current state appears below and updates while this plugin is running.",
   "author": "Kiosk Satellite contributors",
   "license": "Apache-2.0",
   "capabilities": ["host.read"],

@@ -47,6 +47,7 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `getLightLevel` | `{present, lux, live}`. Sensor availability, latest lux reading and whether readings are live. Lux can be null |
 | `getStats` | `{battery, charging, cpu, temp}`. Battery percentage, external power connected, CPU usage percentage and CPU temperature in Celsius. Unavailable numeric readings can be null |
 | `getUptime` | `{app, network}` in seconds. Network is null while offline |
+| `getDashboardState` | `{homeAssistantUrl, startUrl, currentUrl, currentPath}`. Sanitized HTTP/HTTPS URLs and the main WebView path. Fields can be null. See the [dashboard URL guide](dashboard.md) |
 | `getDeviceInfo` | `{name, model, os, osVersion, sdkInt, appVersion, buildNumber, buildMode, package}`. Device and app metadata. IP addresses and unrelated fields are omitted |
 | `getMotionEnabled` | Boolean indicating whether camera motion detection is enabled |
 | `getFaceEnabled` | Boolean indicating whether camera face detection is enabled |
@@ -138,6 +139,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `wakeword.state` | `active`, `listening` and `muted`: booleans |
 | `wakeword.detected` | `model` and `phrase`: wake-word identifiers. No captured audio |
 | `stopword.detected` | No additional fields |
+| `browser.state` | No additional fields. The main WebView URL or saved HA/Start URL changed. Read `getDashboardState` for the current snapshot |
 | `camera.view` | `active`, `viewId`, `viewName` and `focusedCameraId` |
 
 Events are passive observations. Motion, face, person, proximity and wake-word events only exist when the corresponding KS feature is already producing them. A subscription never starts a camera, opens a microphone or changes the screensaver policy. No general event-bus subscription is provided.

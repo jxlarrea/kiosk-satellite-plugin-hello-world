@@ -12,6 +12,8 @@ public final class ReadOnlyPlugin implements KioskPlugin {
     private boolean alive;
     private int screenRevision;
     private int saverRevision;
+    private int dashboardRevision;
+    private String dashboardPath;
     private Boolean screenOn;
     private Boolean screensaverActive;
 
@@ -20,6 +22,8 @@ public final class ReadOnlyPlugin implements KioskPlugin {
         alive = true;
         host.subscribe("screen.state");
         host.subscribe("screensaver.state");
+        host.subscribe("browser.state");
+        readDashboard();
         read("isScreenOn", true);
         read("isScreensaverActive", false);
     }
@@ -36,13 +40,26 @@ public final class ReadOnlyPlugin implements KioskPlugin {
         });
     }
 
+    private void readDashboard() {
+        final int revision = ++dashboardRevision;
+        host.executeCommand("getDashboardState", Collections.emptyMap(), (ok, data, error) -> {
+            if (!alive || revision != dashboardRevision) return;
+            if (!ok) { host.status(error, true); return; }
+            Map<?, ?> state = (Map<?, ?>) data;
+            dashboardPath = (String) state.get("currentPath");
+            showStatus();
+        });
+    }
+
     private void showStatus() {
         if (screenOn == null || screensaverActive == null) return;
         host.status("Screen " + (screenOn ? "on" : "off") + ". Screensaver "
-            + (screensaverActive ? "active." : "idle."), false);
+            + (screensaverActive ? "active." : "idle.")
+            + " Dashboard: " + (dashboardPath == null ? "waiting for a page." : dashboardPath), false);
     }
 
     @Override public void onEvent(String event, Map<String, Object> payload) {
+        if (event.equals("ks.browser.state")) { readDashboard(); return; }
         if (event.equals("ks.screen.state")) { screenRevision++; screenOn = Boolean.TRUE.equals(payload.get("on")); }
         if (event.equals("ks.screensaver.state")) { saverRevision++; screensaverActive = Boolean.TRUE.equals(payload.get("active")); }
         showStatus();

@@ -17,8 +17,9 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
 - [Charts](docs/charts.md): publish line and bar charts, inspect samples and update an existing plugin to use charts.
 - [Sensors, selects and switches](docs/entities.md): publish readings to Home Assistant and handle writable controls.
+- [Dashboard URLs](docs/dashboard.md): discover the configured server and current view without duplicating URL settings.
 - [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces supplied by Kiosk Satellite at runtime.
-- [Read-only example](examples/read-only): a buildable plugin that observes screen and screensaver state.
+- [Read-only example](examples/read-only): a buildable plugin that observes screen, screensaver and dashboard state.
 
 ## Get started
 
