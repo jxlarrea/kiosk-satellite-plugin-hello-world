@@ -1,23 +1,31 @@
-# Hello World for Kiosk Satellite
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/ks_plugin_banner_dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/ks_plugin_banner_light.svg" />
+    <img alt="Kiosk Satellite for Home Assistant" src="assets/ks_plugin_banner_default.svg" width="650" />
+  </picture>
+</h1>
 
-A simple plugin template that opens a draggable greeting window over your Home Assistant dashboard. Change the greeting, count button presses and reopen the window through an assigned action.
+This repository contain the Kiosk Satellite plugin SDK, documentation and getting started guides. Learn how plugins work, build community features and publish a plugin from your own GitHub repository. It also includes **Hello World**, a working starter template with a floating window over the Home Assistant dashboard.
 
-## Install
+All documented features use **SDK 1**, the first public plugin SDK. Plugins require a Kiosk Satellite build with SDK 1 support and Android 7.0 or newer.
 
-This plugin requires a Kiosk Satellite build with SDK 1 plugin support and Android 7.0 or newer.
+## Documentation
 
-1. Open **Settings > Plugin Manager** on the kiosk or **Plugin Manager** in remote admin and turn on **Enable Plugins**.
-2. Choose **Add plugin**, paste this repository's GitHub URL and choose **Preview**.
-3. Read the manifest and this README. Choose **Trust and install** if you trust the code.
-4. Enable **Hello World** from its entry row. Return to the dashboard to see the window.
+- [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
+- [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
+- [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
+- [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces supplied by Kiosk Satellite at runtime.
+- [Read-only example](examples/read-only): a buildable plugin that observes screen and screensaver state.
 
-The master **Enable Plugins** switch pauses all plugins and closes their windows. It keeps each plugin's enabled choice and settings, so turning it back on resumes the selected plugins.
+## Get started
 
-Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog. **Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
+1. Create your own repository from this template and clone it locally. Each repository contains one plugin.
+2. Read the [creating plugins guide](docs/creating-plugins.md) and the [KS interaction reference](docs/ks-api.md) to choose the features and capabilities your plugin needs.
+3. Update `kiosk-satellite-plugin.json`, the Java class/package in `src/` and this README for your plugin. Keep the plugin ID stable after publication.
+4. Build and test locally using the steps below, then [publish a GitHub release](#publish-your-plugin) when it is ready for users.
 
-The plugin runs trusted code inside Kiosk Satellite. It can access app data and granted Android permissions. Review the source before enabling it.
-
-## Build and test
+### Build and test locally
 
 Install Python 3, JDK 17 or newer and an Android SDK with build-tools. Set `ANDROID_HOME` and `JAVA_HOME` as needed.
 
@@ -26,36 +34,52 @@ python3 tools/test.py
 python3 tools/build.py
 ```
 
-The build creates `dist/hello-world-1.0.1.zip`, its `.zip.sha256` checksum file and a copy of `kiosk-satellite-plugin.json` in `dist/`. The ZIP contains that same manifest. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
+With the unchanged template, the build creates `dist/hello-world-1.0.1.zip`, its `.zip.sha256` checksum file and a copy of `kiosk-satellite-plugin.json` in `dist/`. The ZIP contains that same manifest. The SDK sources in `sdk/` are compile-time dependencies. Their classes are not included in the package.
 
-For developer testing only, open **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin and select the ZIP from `dist/`. Confirm that you trust the code, then enable the plugin from its entry row. No GitHub release is needed. Install the replacement ZIP directly. KS stops the plugin automatically and restores its enabled state after the update. A normal update does not require an app restart. Compatible settings are retained. If the existing plugin was installed from GitHub, uninstall it before switching to a local build. Uninstalling deletes its settings.
+For developer testing only, open **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or Remote Admin and select the ZIP from `dist/`. Confirm that you trust the code, then enable the plugin from its entry row. No GitHub release is needed.
 
-## Publish your own plugin
+To test an update, install the replacement ZIP directly. KS stops the plugin automatically and restores its enabled state after the update. A normal update does not require an app restart. Compatible settings are retained. If the existing plugin was installed from GitHub, uninstall it before switching to a local build. Uninstalling deletes its settings.
 
-Create a separate repository from this template. Change `kiosk-satellite-plugin.json`, the Java class/package and this README. Keep the plugin ID stable after publication.
+If you also have the Kiosk Satellite source, check that the template's SDK interfaces match the application:
+
+```sh
+python3 tools/check-sdk.py /path/to/kiosk-satellite
+```
+
+## Hello World starter template
+
+Hello World opens a draggable greeting window over your Home Assistant dashboard. It demonstrates a floating view, configurable settings, a button counter and plugin actions that users can assign to gestures, the kiosk drawer or Home Assistant buttons.
+
+Start with [HelloWorldPlugin.java](src/me/jxl/kiosk/plugins/hello/HelloWorldPlugin.java) and its [manifest](kiosk-satellite-plugin.json), then replace the greeting behavior with your own functionality.
+
+### Install Hello World
+
+1. Open **Settings > Plugin Manager** on the kiosk or **Plugin Manager** in Remote Admin and turn on **Enable Plugins**.
+2. Choose **Add plugin**, paste this repository's GitHub URL and choose **Preview**.
+3. Read the manifest and this README. Choose **Trust and install** if you trust the code.
+4. Enable **Hello World** from its entry row. Return to the dashboard to see the window.
+
+The plugin runs trusted code inside Kiosk Satellite. It can access app data and granted Android permissions. Review the source before enabling it.
+
+### Try the template
+
+Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog.
+
+**Show window** reopens a dismissed window and **Hide window** closes it. Assign these actions in Gestures or open their action rows to add drawer shortcuts or Home Assistant buttons. The floating **Say hello** button increments its counter. Disable or uninstall using the controls on its entry row.
+
+The master **Enable Plugins** switch pauses all plugins and closes their windows. It keeps each plugin's enabled choice and settings, so turning it back on resumes the selected plugins.
+
+## Publish your plugin
 
 1. Build and test locally during development.
 2. Commit the source, README and `kiosk-satellite-plugin.json`.
 3. Publish a stable GitHub release tagged `v<version>` at that commit. The included GitHub Actions workflow tests and builds the source and attaches the manifest, ZIP and checksum automatically. Wait for it to succeed before sharing the release.
-4. Share the public repository URL. Each repository contains one plugin.
+4. Share the public repository URL.
 
 KS discovers the latest stable GitHub release, previews its attached manifest and reads the README from the tagged commit. It downloads the ZIP only after confirmation and verifies the checksum and packaged manifest. Drafts and prereleases are excluded.
 
 Normal installation uses **Add plugin** with the repository URL. KS rejects manually attached assets and requires the GitHub Actions uploader plus a matching GitHub SHA-256 digest. This verifies publication through Actions, not the honesty of the workflow code. See [publishing requirements](docs/creating-plugins.md#repository-and-release). **Install from ZIP** is reserved for developers testing local builds.
 
-## Plugin documentation
-
-This repository is the home for all Kiosk Satellite plugin documentation and the self-contained Hello World template.
-
-- [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
-- [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, package format, build tools and publishing.
-
-Use `python3 tools/check-sdk.py /path/to/kiosk-satellite` to verify that the template's SDK interfaces match the application.
-
 ## License
 
 [Apache-2.0](LICENSE). Kiosk Satellite has its own application license.
-
-## KS integration reference
-
-The [complete plugin interaction reference](docs/ks-api.md) documents host methods, KS state queries, transient controls, passive events, capabilities and lifecycle limits. SDK 1 includes a [buildable read-only example](examples/read-only/src/example/kiosk/ReadOnlyPlugin.java). All documented features use SDK 1, the first public release.

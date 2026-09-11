@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Lead the README with the plugin SDK, documentation and getting started steps before introducing the Hello World template.
+
 - Document automatic setting saves and the on-device text edit dialog.
 
 - Document the entry row update check and info modal, automatic stop and resume during updates and rollback after failed activation.
