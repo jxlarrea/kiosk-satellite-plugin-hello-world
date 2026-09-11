@@ -10,13 +10,21 @@ Plugins add optional features to Kiosk Satellite. The first SDK supports a float
 4. Choose **Trust and install**. Installation downloads and verifies the reviewed release without running its code.
 5. Enable **Hello World** using the switch on its entry row. Return to the dashboard to see its window.
 
-Tap an installed plugin's entry row to open its subpage. Its settings and commands appear there. The enable switch sits on the left of the entry row. The check for updates button beside info checks the latest stable GitHub release and lets you review and install an available update. It reports when no update is available. Local ZIP installs use Install from ZIP instead. The info button before delete opens the saved repository README in a modal, including while offline. Local ZIP installs show a message explaining that no repository README is available. Remote admin uses the same layout and supports direct links to plugin subpages.
+Tap an installed plugin's entry row to open its subpage. Its settings and action shortcut choices appear there. The enable switch sits on the left of the entry row. The check for updates button beside info checks the latest stable GitHub release and lets you review and install an available update. It reports when no update is available. Local ZIP installs use Install from ZIP instead. The info button before delete opens the saved repository README in a modal, including while offline. Local ZIP installs show a message explaining that no repository README is available. Remote admin uses the same layout and supports direct links to plugin subpages.
 
 The master switch explains that plugins add community developed features. A warning about plugin access appears below **Add plugin**. Plugin status refreshes when you open the page.
 
-Drag the window by its title bar. **Say hello** updates its greeting count. Close dismisses the window without disabling the plugin. **Show window** in plugin settings opens it again. The Greeting setting changes its message. **Show window when enabled** controls whether it opens automatically.
+Drag the window by its title bar. **Say hello** updates its greeting count. Close dismisses the window without disabling the plugin. The **Show window** action opens it again through an assigned gesture, drawer shortcut or Home Assistant button. The Greeting setting changes its message. **Show window when enabled** controls whether it opens automatically.
 
 The window stays inside Kiosk Satellite. It needs no Android permission to draw over other apps. The drawer, media player, screensaver, notifications and lockdown shield keep their existing priority above it. Touches outside the window reach the dashboard.
+
+## Action shortcuts
+
+In **Gestures**, choose **Run a plugin action** and select a command from a running plugin. The mapping keeps the plugin and command IDs. Disabling the plugin pauses its actions and a gesture targeting it reports that it cannot run.
+
+In the plugin subpage, open an action to enable **Show in kiosk drawer** or **Expose to Home Assistant**. Both start off. Drawer shortcuts also appear while locked when the owner allows the kiosk drawer. Home Assistant exposure adds a button to the existing ESPHome device and requires ESPHome with native entities enabled. Settings does not include buttons to run actions directly.
+
+Stopping a plugin removes its active shortcuts and ESPHome buttons. Re-enabling restores the selected placements. An update keeps the choices for commands whose IDs still exist. Removing a command removes its placements. Old gesture mappings remain editable and report a failure until reassigned.
 
 ## Enable Plugins
 
@@ -65,6 +73,8 @@ The existing authenticated command API exposes these commands:
 | `disablePlugin` | `id` |
 | `removePlugin` | `id` |
 | `configurePlugin` | `id`, `values`: complete settings object |
+| `getPluginActions` | None. Returns declared actions and their availability |
+| `configurePluginAction` | `id`, `command`, `drawer`: boolean, `homeAssistant`: boolean |
 | `runPluginCommand` | `id`, `command`: manifest command ID |
 
 Use `POST /api/commands/<command>` with the existing remote admin authentication. Each plugin's commands are addressed by its stable ID and command ID. They cannot replace core commands. Plugin management is not exposed to dashboard JavaScript.

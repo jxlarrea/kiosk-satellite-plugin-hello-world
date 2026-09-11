@@ -91,6 +91,10 @@ A setting declares `key`, `title`, `type` and `default`. Types are `string` and 
 
 Settings and commands are scoped to the plugin ID. Do not change that ID after publication. Increasing a plugin's own version does not increase the SDK version.
 
+Declared commands are reusable actions. Users can select them in **Gestures > Run a plugin action**. The plugin subpage lets users opt each command into the kiosk drawer or expose it as an ESPHome button in Home Assistant. Settings configures those placements and does not run the command. These connections work with SDK 1 and SDK 2 without additional plugin capabilities.
+
+Keep command IDs stable across releases. The host retains shortcut choices for commands that survive an update and removes choices for deleted commands. New commands start without drawer or Home Assistant exposure. Commands run through `execute` only while the plugin is running. A saved gesture targeting a disabled or missing plugin reports a failure. Plugins should use hardware entities such as RGB lights for ongoing stateful control and commands for individual operations.
+
 ## Lifecycle
 
 Implement `me.jxl.kiosk.plugins.KioskPlugin`:

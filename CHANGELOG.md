@@ -10,6 +10,8 @@
 
 ### Added
 
+- Document reusable plugin actions for gestures, optional drawer shortcuts and optional Home Assistant buttons.
+
 - Document SDK 2 native files, rich settings, runtime status and RGB entities and vendor backward-compatible host interfaces.
 
 - Document the persistent Enable Plugins master switch, paused plugin behavior and state commands.
