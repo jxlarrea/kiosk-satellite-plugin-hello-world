@@ -91,7 +91,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `description` | Plain text, at most 1000 characters |
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
-| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read` and `host.control` |
+| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control` and `shizuku` |
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
 
@@ -179,3 +179,7 @@ Publish line or bar charts with `host.publishSeries(key, chart)` and remove it w
 ## KS state and transient controls
 
 Declare `host.read` to inspect supported KS state and subscribe to passive events. Declare `host.control` for transient controls such as dismissing the screensaver or showing and hiding camera views and Now Playing. The [complete KS interaction reference](ks-api.md) lists every command, event, payload, capability and limit and includes a buildable example.
+
+## Shizuku
+
+Declare `shizuku` for optional privileged command execution through KS. The [Shizuku guide](shizuku.md) documents setup, user permission, state events, command results and lifecycle limits. Use the separate example to test access without changing the standard Hello World template.

@@ -205,3 +205,7 @@ python3 tools/build.py examples/read-only
 ```
 
 Install `examples/read-only/dist/ks-read-only-example-1.0.0.zip` through **Plugin Manager > Developer Tools > Install from ZIP** on an SDK 1 build. Enable the example and open its subpage to see its status. The Hello World template and Rockchip LED Control use the same SDK 1 contract.
+
+## Optional Shizuku commands
+
+The `shizuku` capability adds `shizukuState()` and asynchronous `executeShizuku(command, timeoutMs, callback)`. It requires separate user permission for KS and does not change the `host.read` or `host.control` allowlists. See the [Shizuku guide](shizuku.md) for the complete contract and separate example.

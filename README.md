@@ -15,6 +15,7 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
 - [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
+- [Shizuku](docs/shizuku.md): optional shell or root commands through KS, explicit permission and a separate example.
 - [Charts](docs/charts.md): publish line and bar charts, inspect samples and update an existing plugin to use charts.
 - [Sensors, selects and switches](docs/entities.md): show live readings in KS, publish them to Home Assistant and handle writable controls.
 - [Dashboard URLs](docs/dashboard.md): discover the configured server and current view without duplicating URL settings.

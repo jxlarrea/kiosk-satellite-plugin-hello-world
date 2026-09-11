@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add optional SDK 1 Shizuku access, documentation and a separate read-only identity example. The standard Hello World template keeps its existing capabilities.
+
 - Demonstrate live readings in KS with numeric values, confirmed states, a history sample count and multiline text. Document automatic display of existing SDK 1 entities without an ESPHome connection.
 
 - Document SDK 1 dashboard URL reads and change notifications, with component redaction and an updated read-only example.
