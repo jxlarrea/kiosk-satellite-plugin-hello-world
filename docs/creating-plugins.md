@@ -193,3 +193,27 @@ Declare `screensaver`, bundle an HTML entry and its resources under `assets/` an
 ## Home Assistant entity settings and reads
 
 Use the `entity` setting type for KS's searchable Home Assistant entity picker in both interfaces. The value is an entity ID or an empty string. Declare `host.read` to read its state or subscribe to changes. See the [Home Assistant entity guide](home-assistant.md) and the Hello World demo.
+
+## Group settings, charts and readings
+
+An optional top-level `groups` array orders settings groups and places their charts and readings directly below their settings. Use the same title as the settings' `group` field:
+
+```json
+"groups": [
+  {
+    "title": "Chart demo",
+    "charts": ["demo"],
+    "readingsTitle": "Chart readings",
+    "readings": ["sensor.wave", "text_sensor.summary"]
+  },
+  {
+    "title": "Home Assistant demo",
+    "readingsTitle": "Home Assistant readings",
+    "readings": ["text_sensor.ha_state", "text_sensor.ha_details"]
+  }
+]
+```
+
+Charts appear after the group's settings, followed by a separate readings section. `readingsTitle` defaults to `Readings`. Chart references use the key passed to `publishSeries`. Reading references use `type.key`, where type is `sensor`, `text_sensor`, `binary_sensor`, `select` or `switch`. Each reference can belong to only one group. References may name readings or charts that have not been published yet. Empty output sections stay hidden.
+
+Declare at most 20 groups, with unique titles matching existing settings groups. A group can reference up to four charts and 32 readings. Settings groups omitted from `groups` follow in their original manifest order. Unassigned charts and readings appear after the settings groups. These placements affect only the plugin subpage, not Home Assistant entities or their names. Runtime updates preserve settings edits and chart interaction state. All fields remain part of SDK 1.

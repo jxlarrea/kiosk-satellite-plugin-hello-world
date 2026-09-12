@@ -164,5 +164,45 @@
       "id": "hide",
       "title": "Hide window"
     }
+  ],
+  "groups": [
+    {
+      "title": "Greeting window"
+    },
+    {
+      "title": "Chart demo",
+      "charts": [
+        "demo"
+      ],
+      "readingsTitle": "Chart readings",
+      "readings": [
+        "sensor.wave",
+        "text_sensor.status",
+        "binary_sensor.chart_active",
+        "switch.chart",
+        "select.pattern",
+        "sensor.samples",
+        "text_sensor.summary"
+      ]
+    },
+    {
+      "title": "Home Assistant demo",
+      "readingsTitle": "Home Assistant readings",
+      "readings": [
+        "text_sensor.ha_state",
+        "text_sensor.ha_details"
+      ]
+    },
+    {
+      "title": "Shizuku demo",
+      "readingsTitle": "Shizuku readings",
+      "readings": [
+        "text_sensor.shizuku_status",
+        "text_sensor.shizuku_output"
+      ]
+    },
+    {
+      "title": "Screensaver demo"
+    }
   ]
 }

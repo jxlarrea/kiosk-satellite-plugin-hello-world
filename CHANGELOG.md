@@ -4,6 +4,8 @@
 
 ### Added
 
+- Keep each demo together using manifest display groups. Chart demo settings are followed by the chart and Chart readings. Home Assistant and Shizuku each have dedicated reading groups below their settings.
+
 - Add a Home Assistant demo with the shared entity picker and live state and detail readings. Document SDK 1 entity reads, subscriptions, availability, reconnection and lifecycle rules.
 
 - Document the expanded SDK 1 device snapshot with RAM, internal storage, IP addresses, battery and display readings, including units, null values and polling guidance.
