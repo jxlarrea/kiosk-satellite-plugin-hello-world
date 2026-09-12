@@ -49,7 +49,7 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `getStats` | `{battery, charging, cpu, temp}`. Battery percentage, external power connected, CPU usage percentage and CPU temperature in Celsius. Unavailable numeric readings can be null |
 | `getUptime` | `{app, network}` in seconds. Network is null while offline |
 | `getDashboardState` | `{homeAssistantUrl, startUrl, currentUrl, currentPath}`. Sanitized HTTP/HTTPS URLs and the main WebView path. Fields can be null. See the [dashboard URL guide](dashboard.md) |
-| `getDeviceInfo` | `{name, model, device, board, manufacturer, abis, os, osVersion, sdkInt, appVersion, buildNumber, buildMode, package}`. Device and app metadata. IP addresses and unrelated fields are omitted |
+| `getDeviceInfo` | `{name, model, device, board, manufacturer, abis, os, osVersion, sdkInt, appVersion, buildNumber, buildMode, package, ramFree, ramTotal, storageFree, storageTotal, ip, ipv6, battery, brightness, screenOn, screenWidth, screenHeight, screenDensity}`. Device identity and a live resource, network and display snapshot. See the field definitions below |
 | `getMotionEnabled` | Boolean indicating whether camera motion detection is enabled |
 | `getFaceEnabled` | Boolean indicating whether camera face detection is enabled |
 | `getProximityEnabled` | Boolean indicating whether proximity detection is enabled |
@@ -58,6 +58,26 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
 Object responses expose only the fields listed above. A field absent from the underlying feature is returned as null. KS failure details are reduced to a generic SDK error rather than exposing internal responses. Reads use the existing feature state and queries. They do not request Android permissions or enable disabled features.
+
+### Device snapshot
+
+`getDeviceInfo` returns the configured device `name`, the existing `model` display string and these additional readings using `host.read`:
+
+| Field | Value |
+| --- | --- |
+| `ramFree`, `ramTotal` | Available and total system RAM in bytes. Available RAM includes memory Android can reclaim, matching KS's device details |
+| `storageFree`, `storageTotal` | Available and total bytes on Android's internal data partition. This is not removable storage or the app's storage usage |
+| `ip` | First non-loopback IPv4 address excluding link-local addresses, or null when unavailable. This is an interface address, not a public IP lookup or a guarantee of the current default route |
+| `ipv6` | List of non-loopback IPv6 addresses across interfaces, including link-local addresses. Empty when none are available |
+| `battery` | Charge percentage from 0 to 100, or null when unavailable or the device has no battery |
+| `brightness` | Current panel brightness setting from 0 to 1, equivalent to `getBrightness` with `{"panel": true}`. Includes KS's window override when active. This is not the adaptive brightness ceiling or a physical luminance measurement |
+| `screenOn` | KS's logical screen status, equivalent to `isScreenOn`. This does not guarantee that manufacturer hardware has fully powered the panel off |
+| `screenWidth`, `screenHeight` | Full display dimensions in pixels as reported by Android. These are not the plugin window dimensions or physical inches |
+| `screenDensity` | Android's logical display density scale, such as 1.0 or 2.0. This is not DPI |
+
+Unavailable resource and display readings are null. These values are collected on demand and may change during the read. The response is not an atomic system snapshot. For frequent updates, keep using `getStats`, `getBrightness` and `isScreenOn` rather than repeatedly collecting all device details and network addresses.
+
+Network addresses are now included in the existing `host.read` capability. No root, Shizuku or additional permission prompt is required. Fields outside this documented response, such as Android build fingerprints, remain filtered out.
 
 ### Android hardware identity
 
