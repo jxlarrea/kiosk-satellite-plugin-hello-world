@@ -15,6 +15,7 @@ import me.jxl.kiosk.plugins.PluginHost;
 /** Settings controls, a floating window, actions, live readings and a read-only chart. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private PluginHost host;
+    private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
     private String message;
     private boolean visible;
@@ -35,8 +36,9 @@ public final class HelloWorldPlugin implements KioskPlugin {
     public synchronized void start(PluginHost host, Map<String, Object> settings) {
         this.host = host;
         configure(settings);
+        shizuku.start(host, settings);
         host.log("Hello World started");
-        host.status("Readings and charts use simulated demo data, not device measurements.", false);
+        host.status("Chart readings use simulated data. Shizuku readings come from this device.", false);
         if (Boolean.TRUE.equals(settings.get("showOnStart"))) show();
         // Seed a short simulated history so the chart is useful immediately.
         long now = System.currentTimeMillis();
@@ -63,13 +65,16 @@ public final class HelloWorldPlugin implements KioskPlugin {
         amplitude = ((Number) settings.get("amplitude")).doubleValue();
         pattern = (String) settings.get("pattern");
         seriesColor = (String) settings.get("seriesColor");
+        shizuku.configure(settings);
         // The next tick publishes chart edits without creating extra update bursts.
         if (visible) show();
         publishEntities();
     }
 
     private synchronized void tick() {
-        if (host == null || !showChart) return;
+        if (host == null) return;
+        shizuku.tick();
+        if (!showChart) return;
         try {
             long now = System.currentTimeMillis();
             if (!times.isEmpty() && now <= times.get(times.size() - 1)) return;
@@ -135,7 +140,9 @@ public final class HelloWorldPlugin implements KioskPlugin {
 
     @Override
     public synchronized void onEvent(String event, Map<String, Object> payload) {
-        if ("window.action".equals(event)) {
+        if ("shizuku.state".equals(event)) {
+            shizuku.stateChanged();
+        } else if ("window.action".equals(event)) {
             greetings++;
             show();
         } else if ("window.closed".equals(event)) visible = false;
@@ -164,6 +171,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     @Override
     public synchronized void stop() {
         // KS revokes the host and removes its windows, charts and entities before stop.
+        shizuku.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;

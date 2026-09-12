@@ -1,6 +1,6 @@
 # Shizuku access
 
-SDK 1 plugins can use KS's Shizuku connection to run commands with the backend's shell or root identity. Declare `shizuku` in `capabilities`. Existing plugins need no changes and the standard Hello World template does not request this permission.
+SDK 1 plugins can use KS's Shizuku connection to run commands with the backend's shell or root identity. Declare `shizuku` in `capabilities`. Existing plugins need no changes. Hello World declares the capability and includes an opt-in Shizuku demo. Declaring the capability does not request permission or run commands.
 
 KS includes the Shizuku API and provider. Do not bundle another copy, modify the app manifest or use Shizuku's deprecated `newProcess` method. KS uses a dedicated UserService for each plugin session. Keep `apiVersion: 1` and copy the current SDK interfaces when adding these methods to an existing repository.
 
@@ -68,6 +68,20 @@ Plugins declaring `shizuku` receive `onEvent("shizuku.state", state)` when the b
 - Helpers are not daemons. Shizuku stops them when the KS process dies. Stopping a helper kills its process group and ordinary child commands. Do not launch detached daemons or commands that create a new session or process group. This API is for bounded commands, not persistent root services, streaming processes or interactive shells.
 
 Running a command does not automatically update settings or Home Assistant entities. Publish the observed result through the regular SDK methods. Granting Shizuku access can permit changes beyond the read-only KS APIs. Plugin authors are responsible for the commands they choose.
+
+## Hello World demo
+
+Hello World's **Shizuku demo** group contains **Enable Shizuku demo** and a **Diagnostic** selector. The toggle defaults to off. After KS has Shizuku access, enable it to read one of these fixed commands every 10 seconds:
+
+| Diagnostic | Command |
+| --- | --- |
+| Process identity | `/system/bin/id` |
+| Android version | `/system/bin/getprop ro.build.version.release` |
+| Kernel version | `/system/bin/uname -r` |
+
+**Shizuku demo status** and **Shizuku result** appear under Readings and as text sensors when exposed to Home Assistant. The chart's simulated values remain separate from these real device readings. The demo keeps working when the chart is hidden.
+
+[ShizukuDemo.java](../src/me/jxl/kiosk/plugins/hello/ShizukuDemo.java) handles unavailable access, timeouts, nonzero exits, truncated output and synchronous request failures. It allows one pending request, clears stale readings and discards callbacks after a selection change or stop. The existing sampler checks for work without blocking KS callbacks. Disable the demo to stop new commands or disable the plugin to stop its helper.
 
 ## Try the separate example
 

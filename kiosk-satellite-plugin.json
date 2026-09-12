@@ -11,7 +11,8 @@
   "license": "Apache-2.0",
   "capabilities": [
     "overlay",
-    "entities"
+    "entities",
+    "shizuku"
   ],
   "settings": [
     {
@@ -93,6 +94,27 @@
       "default": "#1976D2",
       "group": "Chart demo",
       "description": "Color picker: set the Wave series color."
+    },
+    {
+      "key": "shizukuDemo",
+      "type": "boolean",
+      "title": "Enable Shizuku demo",
+      "default": false,
+      "group": "Shizuku demo",
+      "description": "Read a device diagnostic through Shizuku every 10 seconds. Results appear in Readings."
+    },
+    {
+      "key": "shizukuDiagnostic",
+      "type": "select",
+      "title": "Diagnostic",
+      "default": "Process identity",
+      "options": [
+        "Process identity",
+        "Android version",
+        "Kernel version"
+      ],
+      "group": "Shizuku demo",
+      "description": "Choose the read-only command to run after granting Shizuku access."
     }
   ],
   "commands": [

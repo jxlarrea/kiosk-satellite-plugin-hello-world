@@ -4,7 +4,9 @@
 
 ### Added
 
-- Add optional SDK 1 Shizuku access, documentation and a separate read-only identity example. The standard Hello World template keeps its existing capabilities.
+- Add an opt-in Shizuku demo group to Hello World with process identity, Android version and kernel version diagnostics. Publish results as live readings, handle unavailable access and ignore stale callbacks without affecting the greeting or chart.
+
+- Add optional SDK 1 Shizuku access, documentation and a separate read-only identity example.
 
 - Demonstrate live readings in KS with numeric values, confirmed states, a history sample count and multiline text. Document automatic display of existing SDK 1 entities without an ESPHome connection.
 

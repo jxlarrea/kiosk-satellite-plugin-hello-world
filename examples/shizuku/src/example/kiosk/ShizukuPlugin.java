@@ -5,7 +5,7 @@ import java.util.Map;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** A separate opt-in example. The standard Hello World needs no Shizuku permission. */
+/** A minimal Shizuku example without the other Hello World demonstrations. */
 public final class ShizukuPlugin implements KioskPlugin {
     private PluginHost host;
     private boolean pending;
