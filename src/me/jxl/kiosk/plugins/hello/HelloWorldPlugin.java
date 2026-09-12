@@ -19,6 +19,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     private Map<String, Object> savedSettings;
     private String message;
     private boolean visible;
+    private String screensaverHtml;
     private int greetings;
     private boolean showChart;
     private boolean compactChart;
@@ -66,6 +67,11 @@ public final class HelloWorldPlugin implements KioskPlugin {
         pattern = (String) settings.get("pattern");
         seriesColor = (String) settings.get("seriesColor");
         shizuku.configure(settings);
+        String nextScreensaver = DvdScreensaver.document(settings);
+        if (!nextScreensaver.equals(screensaverHtml)) {
+            host.publishScreensaver("dvd", "DVD Logo", nextScreensaver);
+            screensaverHtml = nextScreensaver;
+        }
         // The next tick publishes chart edits without creating extra update bursts.
         if (visible) show();
         publishEntities();
@@ -176,6 +182,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;
         showChart = false;
+        screensaverHtml = null;
         host = null;
     }
 }

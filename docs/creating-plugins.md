@@ -91,7 +91,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `description` | Plain text, at most 1000 characters |
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
-| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control` and `shizuku` |
+| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control`, `shizuku` and `screensaver` |
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
 
@@ -183,3 +183,7 @@ Declare `host.read` to inspect supported KS state and subscribe to passive event
 ## Shizuku
 
 Declare `shizuku` for optional privileged command execution through KS. The [Shizuku guide](shizuku.md) documents setup, user permission, state events, command results and lifecycle limits. Use the separate example to test access without changing the standard Hello World template.
+
+## Screensavers
+
+Declare `screensaver` and publish a self-contained HTML document with `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with two color settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.

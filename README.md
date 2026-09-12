@@ -15,6 +15,7 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
 - [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.
+- [Screensavers](docs/screensavers.md): custom rendering inside the stock screensaver system, with a bouncing DVD demo.
 - [Shizuku](docs/shizuku.md): optional shell or root commands through KS, explicit permission, the Hello World demo and a minimal example.
 - [Charts](docs/charts.md): publish line and bar charts, inspect samples and update an existing plugin to use charts.
 - [Sensors, selects and switches](docs/entities.md): show live readings in KS, publish them to Home Assistant and handle writable controls.
@@ -69,7 +70,7 @@ The plugin runs trusted code inside Kiosk Satellite. It can access app data and 
 
 Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog.
 
-The settings are grouped into **Greeting window**, **Chart demo** and **Shizuku demo**. The chart uses simulated values, not device measurements. Its 120-sample history covers about four minutes and updates every two seconds while **Show demo chart** is on.
+The settings are grouped into **Greeting window**, **Chart demo**, **Shizuku demo** and **Screensaver demo**. The chart uses simulated values, not device measurements. Its 120-sample history covers about four minutes and updates every two seconds while **Show demo chart** is on.
 
 | Control | Example |
 | --- | --- |
@@ -96,6 +97,10 @@ Open **Plugin Manager > Hello World** on-device or in Remote Admin. **Readings**
 With ESPHome and native entities enabled in KS, Hello World also exposes **Simulated wave** as a numeric sensor, **Demo status** as a text sensor, **Demo chart active** as a binary sensor, **Demo pattern** as a select and **Demo chart** as a switch. The numeric value follows the chart and becomes unknown when the chart is hidden. Changing Demo pattern in Home Assistant updates the plugin's Pattern setting and its next samples. Demo chart controls the same Show demo chart setting used in the subpage. These chart readings are simulated. The optional Shizuku diagnostics below read the device.
 
 Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/entities.md) explains how to publish your own readings and handle select and switch requests.
+
+### Try the DVD screensaver
+
+Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver > Screensaver mode** or in a schedule entry. KS uses its stock screensaver settings and renders the bouncing DVD logo as the content. In Hello World's **Screensaver demo** group, **Logo color** and **Background color** save automatically and refresh the active screensaver. See the [screensaver guide](docs/screensavers.md) for the rendering API and lifecycle.
 
 ### Try Shizuku
 

@@ -8,6 +8,12 @@ import me.jxl.kiosk.plugins.hello.HelloWorldPlugin;
 
 public final class HelloWorldTest {
     static final class Host implements PluginHost {
+        String screensaver;
+        int screensaverPublications;
+        public void publishScreensaver(String key, String title, String html) {
+            assert "dvd".equals(key) && "DVD Logo".equals(title);
+            screensaver = html; screensaverPublications++;
+        }
         String title;
         String message;
         String status;
@@ -56,6 +62,13 @@ public final class HelloWorldTest {
         try {
             plugin.start(host, settings);
             assert host.visible && "Testing".equals(host.message);
+            assert host.screensaver.contains("#00D4FF") && host.screensaver.contains("requestAnimationFrame");
+            settings.put("dvdLogoColor", "#112233"); settings.put("dvdBackgroundColor", "#223344");
+            plugin.configure(settings);
+            assert host.screensaver.contains("#112233") && host.screensaver.contains("#223344");
+            int renderUpdates = host.screensaverPublications;
+            plugin.configure(settings);
+            assert host.screensaverPublications == renderUpdates : "Unchanged settings restarted the renderer";
             assert host.status.contains("simulated");
             assert "line".equals(host.chart.get("type"));
             assert host.switchOn;

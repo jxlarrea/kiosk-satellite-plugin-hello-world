@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add SDK 1 screensaver rendering and a bouncing DVD Logo demo with Logo color and Background color settings. Document stock settings, lifecycle, document limits and fleet behavior.
+
 - Add an opt-in Shizuku demo group to Hello World with process identity, Android version and kernel version diagnostics. Publish results as live readings, handle unavailable access and ignore stale callbacks without affecting the greeting or chart.
 
 - Add optional SDK 1 Shizuku access, documentation and a separate read-only identity example.

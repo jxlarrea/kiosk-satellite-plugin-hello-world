@@ -1,6 +1,6 @@
 # Plugin interactions with Kiosk Satellite
 
-SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches and RGB lights are also supported.
+SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches, RGB lights and screensaver renderers are also supported.
 
 ## Capabilities
 
@@ -9,6 +9,7 @@ Every plugin declares `"apiVersion": 1`. All features below belong to that singl
 | Manifest capability | Host interaction |
 | --- | --- |
 | `overlay` | Show or update the plugin's floating window |
+| `screensaver` | Register rendering content inside the stock screensaver system |
 | None | Hide its window, log, publish runtime status and charts, save its own settings and receive declared actions |
 | `native` | Locate its verified packaged JNI library and DEX container |
 | `entities` | Publish and remove its own RGB lights, sensors, selects and switches |
@@ -167,6 +168,7 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `hideWindow()` | Removes that plugin's window |
 | `log(message)` | Plugin-prefixed diagnostic log, truncated to 1000 characters |
 | `status(message, error)` | Runtime status in the plugin subpage, at most 1000 characters. Not persisted |
+| `publishScreensaver(key, title, html)` / `removeScreensaver(key)` | With `screensaver`, register or withdraw rendering content inside the stock screensaver system. See [screensavers](screensavers.md). |
 | `publishSeries(key, chart)` | Publish a read-only chart in the plugin subpage. Up to four charts per session with four series and 240 samples each. See the [chart API](charts.md) |
 | `removeSeries(key)` | Remove a chart from the active plugin session |
 | `saveSettings(values)` | Saves values validated against the plugin's declared settings. Unknown keys are rejected and omitted values use defaults. Does not invoke `configure` again |

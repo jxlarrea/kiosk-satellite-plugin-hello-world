@@ -12,7 +12,8 @@
   "capabilities": [
     "overlay",
     "entities",
-    "shizuku"
+    "shizuku",
+    "screensaver"
   ],
   "settings": [
     {
@@ -115,6 +116,22 @@
       ],
       "group": "Shizuku demo",
       "description": "Choose the read-only command to run after granting Shizuku access."
+    },
+    {
+      "key": "dvdLogoColor",
+      "type": "color",
+      "title": "Logo color",
+      "default": "#00D4FF",
+      "group": "Screensaver demo",
+      "description": "DVD logo color. Select DVD Logo (Hello World) in Screensaver mode to use this demo."
+    },
+    {
+      "key": "dvdBackgroundColor",
+      "type": "color",
+      "title": "Background color",
+      "default": "#000000",
+      "group": "Screensaver demo",
+      "description": "Background behind the bouncing logo. Uses all stock screensaver settings."
     }
   ],
   "commands": [
