@@ -12,6 +12,7 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 
 ## Documentation
 
+- [Home Assistant entity reads and subscriptions](docs/home-assistant.md): use the standard entity picker and follow live states through KS-managed authentication.
 - [Creating plugins](docs/creating-plugins.md): SDK interfaces, lifecycle, settings, package format, build tools and publishing.
 - [Interacting with Kiosk Satellite](docs/ks-api.md): host methods, state queries, transient controls, passive events, capabilities and lifecycle limits.
 - [Installing and managing plugins](docs/installing-plugins.md): installation, settings, trust, updates and the remote API.

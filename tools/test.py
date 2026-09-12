@@ -13,7 +13,7 @@ def tool(name):
 sources = [*sorted((root / 'sdk/src').rglob('*.java')), *sorted((root / 'src').rglob('*.java')), *sorted((root / 'tests').rglob('*.java'))]
 with tempfile.TemporaryDirectory(prefix='kiosk-plugin-test-') as directory:
     subprocess.run([tool('javac'), '--release', '8', '-d', directory, *map(str, sources)], check=True)
-    for test in ['HelloWorldTest', 'me.jxl.kiosk.plugins.hello.ShizukuDemoTest']:
+    for test in ['HelloWorldTest', 'me.jxl.kiosk.plugins.hello.ShizukuDemoTest', 'me.jxl.kiosk.plugins.hello.HomeAssistantDemoTest']:
         subprocess.run([tool('java'), '-ea', '-cp', directory, test], check=True)
 
 subprocess.run([sys.executable, str(root / 'tools/test_android_sdk.py')], check=True)

@@ -33,7 +33,7 @@ host.executeCommand("isScreensaverActive", Collections.emptyMap(), (ok, data, er
 
 `executeCommand(String command, Map<String, Object> arguments, PluginHost.CommandCallback callback)` returns immediately. `onResult(boolean ok, Object data, String error)` runs later on the plugin's serialized callback worker. Data is a detached JSON-compatible value: a map, list, string, number, boolean or null. Check `ok` before reading it. On success `error` is null. Missing platform support or an unavailable feature can produce a null reading or a failed result.
 
-Except for `getBrightness`, every read command requires an empty arguments map. Names are case-sensitive. The read and control tables form the complete command allowlist. A new core KS command does not automatically become available to plugins.
+Except for `getBrightness` and `getHaEntityState`, every read command requires an empty arguments map. Names are case-sensitive. The read and control tables form the complete command allowlist. A new core KS command does not automatically become available to plugins.
 
 | Command | Result |
 | --- | --- |
@@ -55,6 +55,7 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `getProximityEnabled` | Boolean indicating whether proximity detection is enabled |
 | `getCameraViewState` | `{active, viewId, viewName, focusedCameraId}` for the existing camera overlay. IDs and name can be null. No images or stream URLs |
 | `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
+| `getHaEntityState` | `{entityId: string}` arguments. Returns `{entityId, status, state, attributes, lastChanged, lastUpdated}`. Read-only HA entity snapshot. See the [Home Assistant guide](home-assistant.md) |
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
 Object responses expose only the fields listed above. A field absent from the underlying feature is returned as null. KS failure details are reduced to a generic SDK error rather than exposing internal responses. Reads use the existing feature state and queries. They do not request Android permissions or enable disabled features.
@@ -181,6 +182,8 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 Events are passive observations. Motion, face, person, proximity and wake-word events only exist when the corresponding KS feature is already producing them. A subscription never starts a camera, opens a microphone or changes the screensaver policy. No general event-bus subscription is provided.
 
 Delivery is best effort. KS coalesces repeated events of the same type over a 100 ms window and keeps only the latest pending payload of each type while the plugin is busy. Do not use these events as an audit log or exact occurrence counter.
+
+Entity-specific events use `ha.entity.<entity_id>` with `host.read` and arrive as `ks.ha.entity.<entity_id>`. They include an initial state, live updates and connection status. See the [Home Assistant guide](home-assistant.md) for payloads, limits and subscription cleanup.
 
 ## Lifetime, errors and limits
 

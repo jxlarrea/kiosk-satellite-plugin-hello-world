@@ -13,7 +13,8 @@
     "overlay",
     "entities",
     "shizuku",
-    "screensaver"
+    "screensaver",
+    "host.read"
   ],
   "settings": [
     {
@@ -144,6 +145,14 @@
       "default": "#000000",
       "group": "Screensaver demo",
       "description": "Background behind the bouncing logo. Uses all stock screensaver settings."
+    },
+    {
+      "key": "haEntity",
+      "type": "entity",
+      "title": "Home Assistant entity",
+      "default": "",
+      "group": "Home Assistant demo",
+      "description": "Choose an entity to show its state and follow changes through Kiosk Satellite."
     }
   ],
   "commands": [

@@ -97,7 +97,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
 
-A setting declares `key`, `title`, `type` and `default`. Types are `string` and `boolean`. Strings allow up to 512 characters. Keys start with a letter and contain letters, digits or underscores. A command declares `id` and `title`. Command IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
+A setting declares `key`, `title`, `type` and `default`. Types are `string`, `boolean`, `number`, `color`, `select` and `entity`. Strings allow up to 512 characters. Keys start with a letter and contain letters, digits or underscores. A command declares `id` and `title`. Command IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
 
 Settings and commands are scoped to the plugin ID. Do not change that ID after publication. Increasing a plugin's own version does not increase the SDK version.
 
@@ -188,4 +188,8 @@ Declare `shizuku` for optional privileged command execution through KS. The [Shi
 
 ## Screensavers
 
-Declare `screensaver`, bundle an HTML entry and its resources under `assets/` and register it with `host.publishScreensaverAsset(key, title, entry, data)`. Files load on demand from the verified package. Small inline renderers can still use `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with two color settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.
+Declare `screensaver`, bundle an HTML entry and its resources under `assets/` and register it with `host.publishScreensaverAsset(key, title, entry, data)`. Files load on demand from the verified package. Small inline renderers can still use `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with color and size settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.
+
+## Home Assistant entity settings and reads
+
+Use the `entity` setting type for KS's searchable Home Assistant entity picker in both interfaces. The value is an entity ID or an empty string. Declare `host.read` to read its state or subscribe to changes. See the [Home Assistant entity guide](home-assistant.md) and the Hello World demo.

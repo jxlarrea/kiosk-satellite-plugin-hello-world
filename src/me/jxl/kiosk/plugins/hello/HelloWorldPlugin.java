@@ -14,6 +14,7 @@ import me.jxl.kiosk.plugins.PluginHost;
 
 /** Settings controls, a floating window, actions, live readings and a read-only chart. */
 public final class HelloWorldPlugin implements KioskPlugin {
+    private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
@@ -57,6 +58,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     @Override
     public synchronized void configure(Map<String, Object> settings) {
         savedSettings = new LinkedHashMap<>(settings);
+        homeAssistant.configure(host, settings);
         message = (String) settings.get("message");
         boolean nextChart = Boolean.TRUE.equals(settings.get("showChart"));
         if (showChart && !nextChart) host.removeSeries("demo");
@@ -146,6 +148,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
 
     @Override
     public synchronized void onEvent(String event, Map<String, Object> payload) {
+        homeAssistant.onEvent(event, payload);
         if ("shizuku.state".equals(event)) {
             shizuku.stateChanged();
         } else if ("window.action".equals(event)) {
@@ -178,6 +181,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     public synchronized void stop() {
         // KS revokes the host and removes its windows, charts and entities before stop.
         shizuku.stop();
+        homeAssistant.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;
