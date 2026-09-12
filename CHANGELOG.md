@@ -4,6 +4,10 @@
 
 ### Added
 
+- Add a Logo size slider to the DVD screensaver demo, from 50% to 200% with the original size at 100%. Size changes save automatically and keep the logo inside its available viewport.
+
+- Bundle screensaver HTML, CSS, JavaScript, images and fonts under assets and load them on demand through the SDK. Move the DVD demo to separate files, retain its color settings and document asset validation and package limits. Raise the inline HTML limit to 512 KiB.
+
 - Add SDK 1 screensaver rendering and a bouncing DVD Logo demo with Logo color and Background color settings. Document stock settings, lifecycle, document limits and fleet behavior.
 
 - Add an opt-in Shizuku demo group to Hello World with process identity, Android version and kernel version diagnostics. Publish results as live readings, handle unavailable access and ignore stale callbacks without affecting the greeting or chart.
@@ -15,6 +19,10 @@
 - Document SDK 1 dashboard URL reads and change notifications, with component redaction and an updated read-only example.
 
 - Add SDK 1 writable switches with boolean commands and confirmed states. Hello World exposes its chart toggle and the entity guide documents the protocol limits and migration steps.
+
+### Changed
+
+- Update the plugin description to explain that Hello World showcases SDK capabilities and serves as a starting point for other plugins.
 
 ## 1.2.0
 

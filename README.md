@@ -100,7 +100,7 @@ Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/e
 
 ### Try the DVD screensaver
 
-Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver > Screensaver mode** or in a schedule entry. KS uses its stock screensaver settings and renders the bouncing DVD logo as the content. In Hello World's **Screensaver demo** group, **Logo color** and **Background color** save automatically and refresh the active screensaver. See the [screensaver guide](docs/screensavers.md) for the rendering API and lifecycle.
+Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver > Screensaver mode** or in a schedule entry. KS uses its stock screensaver settings and renders the bouncing DVD logo as the content. In Hello World's **Screensaver demo** group, **Logo size**, **Logo color** and **Background color** save automatically and refresh the active screensaver. The demo loads separate HTML, CSS, JavaScript and SVG files from [assets/dvd](assets/dvd). See the [screensaver guide](docs/screensavers.md) for the rendering API and lifecycle.
 
 ### Try Shizuku
 

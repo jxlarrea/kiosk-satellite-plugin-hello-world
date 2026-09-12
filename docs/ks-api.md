@@ -168,6 +168,7 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `hideWindow()` | Removes that plugin's window |
 | `log(message)` | Plugin-prefixed diagnostic log, truncated to 1000 characters |
 | `status(message, error)` | Runtime status in the plugin subpage, at most 1000 characters. Not persisted |
+| `publishScreensaverAsset(key, title, entry, data)` | With `screensaver`, register an HTML asset and scalar rendering options. Bundled resources load on demand from the verified package. See [screensavers](screensavers.md). |
 | `publishScreensaver(key, title, html)` / `removeScreensaver(key)` | With `screensaver`, register or withdraw rendering content inside the stock screensaver system. See [screensavers](screensavers.md). |
 | `publishSeries(key, chart)` | Publish a read-only chart in the plugin subpage. Up to four charts per session with four series and 240 samples each. See the [chart API](charts.md) |
 | `removeSeries(key)` | Remove a chart from the active plugin session |

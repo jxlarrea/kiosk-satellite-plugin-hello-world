@@ -12,6 +12,7 @@ import zipfile
 
 from android_sdk import android_platform
 from plugin_manifest import build_manifest
+from plugin_assets import asset_files, MAX_PACKAGE_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
@@ -25,6 +26,10 @@ try:
 except ValueError as error:
     parser.error(str(error))
 manifest = json.loads(manifest_bytes)
+try:
+    assets = asset_files(plugin)
+except ValueError as error:
+    parser.error(str(error))
 sdk_root = Path(os.environ.get('ANDROID_HOME', os.environ.get('ANDROID_SDK_ROOT', str(Path.home() / 'android-sdk'))))
 java_root = os.environ.get('JAVA_HOME')
 def java_tool(name):
@@ -58,10 +63,18 @@ with tempfile.TemporaryDirectory(prefix='kiosk-plugin-') as temp:
         for file in sorted(dex.glob('*.dex')):
             add(archive, file.name, file.read_bytes())
     package = out / f"{manifest['id']}-{manifest['version']}.zip"
+    expanded = len(manifest_bytes) + jar.stat().st_size + (plugin / 'LICENSE').stat().st_size + sum(file.stat().st_size for _, file in assets)
+    if expanded > MAX_PACKAGE_BYTES:
+        raise SystemExit('Expanded plugin exceeds 4 MB')
     with zipfile.ZipFile(package, 'w', zipfile.ZIP_DEFLATED) as archive:
         add(archive, 'kiosk-satellite-plugin.json', manifest_bytes)
         add(archive, 'plugin.jar', jar.read_bytes())
         add(archive, 'LICENSE', (plugin / 'LICENSE').read_bytes())
+        for name, file in assets:
+            add(archive, name, file.read_bytes())
+    if package.stat().st_size > MAX_PACKAGE_BYTES:
+        package.unlink()
+        raise SystemExit('Plugin ZIP must be at most 4 MB')
     digest = hashlib.sha256(package.read_bytes()).hexdigest()
     package.with_suffix('.zip.sha256').write_text(f'{digest}  {package.name}\n')
     (out / 'kiosk-satellite-plugin.json').write_bytes(manifest_bytes)

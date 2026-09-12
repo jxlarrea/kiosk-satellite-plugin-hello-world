@@ -19,7 +19,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     private Map<String, Object> savedSettings;
     private String message;
     private boolean visible;
-    private String screensaverHtml;
+    private Map<String, Object> screensaverOptions;
     private int greetings;
     private boolean showChart;
     private boolean compactChart;
@@ -67,10 +67,10 @@ public final class HelloWorldPlugin implements KioskPlugin {
         pattern = (String) settings.get("pattern");
         seriesColor = (String) settings.get("seriesColor");
         shizuku.configure(settings);
-        String nextScreensaver = DvdScreensaver.document(settings);
-        if (!nextScreensaver.equals(screensaverHtml)) {
-            host.publishScreensaver("dvd", "DVD Logo", nextScreensaver);
-            screensaverHtml = nextScreensaver;
+        Map<String, Object> nextScreensaver = DvdScreensaver.options(settings);
+        if (!nextScreensaver.equals(screensaverOptions)) {
+            host.publishScreensaverAsset("dvd", "DVD Logo", "dvd/index.html", nextScreensaver);
+            screensaverOptions = nextScreensaver;
         }
         // The next tick publishes chart edits without creating extra update bursts.
         if (visible) show();
@@ -182,7 +182,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;
         showChart = false;
-        screensaverHtml = null;
+        screensaverOptions = null;
         host = null;
     }
 }

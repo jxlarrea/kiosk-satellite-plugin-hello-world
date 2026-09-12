@@ -8,11 +8,11 @@ import me.jxl.kiosk.plugins.hello.HelloWorldPlugin;
 
 public final class HelloWorldTest {
     static final class Host implements PluginHost {
-        String screensaver;
+        Map<String, Object> screensaver;
         int screensaverPublications;
-        public void publishScreensaver(String key, String title, String html) {
+        public void publishScreensaverAsset(String key, String title, String entry, Map<String, Object> data) {
             assert "dvd".equals(key) && "DVD Logo".equals(title);
-            screensaver = html; screensaverPublications++;
+            assert "dvd/index.html".equals(entry); screensaver = new HashMap<>(data); screensaverPublications++;
         }
         String title;
         String message;
@@ -62,10 +62,10 @@ public final class HelloWorldTest {
         try {
             plugin.start(host, settings);
             assert host.visible && "Testing".equals(host.message);
-            assert host.screensaver.contains("#00D4FF") && host.screensaver.contains("requestAnimationFrame");
+            assert host.screensaver.get("logoColor").equals("#00D4FF");
             settings.put("dvdLogoColor", "#112233"); settings.put("dvdBackgroundColor", "#223344");
             plugin.configure(settings);
-            assert host.screensaver.contains("#112233") && host.screensaver.contains("#223344");
+            assert host.screensaver.get("logoColor").equals("#112233") && host.screensaver.get("backgroundColor").equals("#223344");
             int renderUpdates = host.screensaverPublications;
             plugin.configure(settings);
             assert host.screensaverPublications == renderUpdates : "Unchanged settings restarted the renderer";

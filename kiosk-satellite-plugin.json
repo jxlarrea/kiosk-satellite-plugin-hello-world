@@ -6,7 +6,7 @@
   "apiVersion": 1,
   "minAndroidSdk": 24,
   "entryClass": "me.jxl.kiosk.plugins.hello.HelloWorldPlugin",
-  "description": "A floating greeting over the Home Assistant dashboard. Use this plugin as a starting point for your own.",
+  "description": "A sample plugin that showcases the SDK capabilities. Use this plugin as a starting point for your own.",
   "author": "Kiosk Satellite contributors",
   "license": "Apache-2.0",
   "capabilities": [
@@ -116,6 +116,18 @@
       ],
       "group": "Shizuku demo",
       "description": "Choose the read-only command to run after granting Shizuku access."
+    },
+    {
+      "key": "dvdLogoSize",
+      "type": "number",
+      "title": "Logo size",
+      "default": 100,
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "group": "Screensaver demo",
+      "description": "Resize the bouncing DVD logo. 100% uses the original size."
     },
     {
       "key": "dvdLogoColor",

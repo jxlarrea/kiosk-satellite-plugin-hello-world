@@ -20,7 +20,7 @@ The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contr
 
 ## Test a local build
 
-For developer testing only, use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar` and `LICENSE`. The standalone release manifest and checksum file are only needed when publishing to GitHub.
+For developer testing only, use **Plugin Manager > Developer Tools > Install from ZIP** on the kiosk or remote admin. Select the built ZIP from `dist/`, confirm that you trust the code and enable the installed plugin. The ZIP contains `kiosk-satellite-plugin.json`, `plugin.jar`, `LICENSE` and any bundled `assets/` files. The standalone release manifest and checksum file are only needed when publishing to GitHub.
 
 Local packages use the same 4 MB size limit, manifest validation and DEX checks as release packages. New plugins start disabled. To test another build, install the replacement ZIP directly. KS automatically stops running plugins and restores their enabled state after the update. A normal update does not require an app restart. Compatible settings are retained. A local ZIP cannot replace a plugin installed from GitHub. Uninstall that plugin first, which also deletes its settings.
 
@@ -43,7 +43,7 @@ kiosk-satellite-plugin.json
 <id>-<version>.zip.sha256
 ```
 
-Use `.github/workflows/build.yml` from this template. It builds on a published release or an explicit retry on an existing release tag, not on each commit. It compiles the tagged source on `ubuntu-24.04`, tests it and uploads with `${{ github.token }}`. The tag supplies the package version, optionally prefixed by `v`. The workflow passes it as `--version` to the builder, which uses it in both generated manifests and the ZIP filename. The source manifest keeps its local development version. When updating an existing workflow, also copy `tools/build.py`, `tools/android_sdk.py` and `tools/plugin_manifest.py` from the template so the builder supports the version argument. Keep all three assets from the same workflow build.
+Use `.github/workflows/build.yml` from this template. It builds on a published release or an explicit retry on an existing release tag, not on each commit. It compiles the tagged source on `ubuntu-24.04`, tests it and uploads with `${{ github.token }}`. The tag supplies the package version, optionally prefixed by `v`. The workflow passes it as `--version` to the builder, which uses it in both generated manifests and the ZIP filename. The source manifest keeps its local development version. When updating an existing workflow, also copy `tools/build.py`, `tools/android_sdk.py`, `tools/plugin_manifest.py` and `tools/plugin_assets.py` from the template so the builder supports the version argument. Keep all three assets from the same workflow build.
 
 KS requires GitHub's uploader identity to be `github-actions[bot]` for all three assets and checks the ZIP against both GitHub's asset digest and the release checksum. A manually attached ZIP, manifest or checksum is rejected. Uploading through a personal access token is also rejected. ZIP installation is a developer escape hatch for local testing and does not count as a verified repository release.
 
@@ -63,13 +63,15 @@ Rebuilds use fixed ZIP timestamps, but toolchain changes can still change DEX ou
 
 ## Package
 
-A ZIP contains exactly these files at its root:
+A ZIP requires these files at its root:
 
 ```text
 kiosk-satellite-plugin.json
 plugin.jar
 LICENSE
 ```
+
+Optional files under `assets/` are included by the build tool for screensaver rendering. Asset contents count toward the existing 4 MiB package and expanded-size limits. See the [screensaver guide](screensavers.md) for supported paths and loading behavior.
 
 `plugin.jar` contains `classes.dex` and optional additional `classesN.dex` files. It must not contain a copy of the SDK, Java class files or native libraries. The build tool compiles against the SDK and packages only your plugin classes. External dependencies need their own build integration and license review.
 
@@ -186,4 +188,4 @@ Declare `shizuku` for optional privileged command execution through KS. The [Shi
 
 ## Screensavers
 
-Declare `screensaver` and publish a self-contained HTML document with `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with two color settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.
+Declare `screensaver`, bundle an HTML entry and its resources under `assets/` and register it with `host.publishScreensaverAsset(key, title, entry, data)`. Files load on demand from the verified package. Small inline renderers can still use `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with two color settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.
