@@ -49,7 +49,7 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `getStats` | `{battery, charging, cpu, temp}`. Battery percentage, external power connected, CPU usage percentage and CPU temperature in Celsius. Unavailable numeric readings can be null |
 | `getUptime` | `{app, network}` in seconds. Network is null while offline |
 | `getDashboardState` | `{homeAssistantUrl, startUrl, currentUrl, currentPath}`. Sanitized HTTP/HTTPS URLs and the main WebView path. Fields can be null. See the [dashboard URL guide](dashboard.md) |
-| `getDeviceInfo` | `{name, model, os, osVersion, sdkInt, appVersion, buildNumber, buildMode, package}`. Device and app metadata. IP addresses and unrelated fields are omitted |
+| `getDeviceInfo` | `{name, model, device, board, manufacturer, abis, os, osVersion, sdkInt, appVersion, buildNumber, buildMode, package}`. Device and app metadata. IP addresses and unrelated fields are omitted |
 | `getMotionEnabled` | Boolean indicating whether camera motion detection is enabled |
 | `getFaceEnabled` | Boolean indicating whether camera face detection is enabled |
 | `getProximityEnabled` | Boolean indicating whether proximity detection is enabled |
@@ -58,6 +58,21 @@ Except for `getBrightness`, every read command requires an empty arguments map. 
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
 Object responses expose only the fields listed above. A field absent from the underlying feature is returned as null. KS failure details are reduced to a generic SDK error rather than exposing internal responses. Reads use the existing feature state and queries. They do not request Android permissions or enable disabled features.
+
+### Android hardware identity
+
+`getDeviceInfo` includes raw Android build metadata through the existing `host.read` capability. It does not require root, Shizuku or an additional Android permission. SDK `apiVersion` remains 1.
+
+| Field | Value |
+| --- | --- |
+| `model` | Existing display string combining manufacturer and model. Do not split it to identify hardware |
+| `device` | Android `Build.DEVICE`, the product codename, such as `rk3576_u` |
+| `board` | Android `Build.BOARD`, the board identifier. This is the vendor's reported value, not a normalized SoC name or `Build.HARDWARE` |
+| `manufacturer` | Android `Build.MANUFACTURER` without the model appended |
+| `abis` | List of Android `Build.SUPPORTED_ABIS` in preference order, such as `["arm64-v8a", "armeabi-v7a", "armeabi"]` |
+| `sdkInt` | Existing Android API level, useful alongside `abis` when choosing compatible native packages |
+
+Before Android metadata is initialized or on another platform, `device`, `board` and `manufacturer` are null and `abis` is empty. A 64-bit processor running 32-bit Android reports the ABIs supported by that Android installation. Use `abis` to select a compatible build rather than guessing from the board or model.
 
 ## Transient controls
 

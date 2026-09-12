@@ -4,6 +4,8 @@
 
 ### Added
 
+- Document the SDK 1 device codename, board, manufacturer and ordered ABI fields available through `getDeviceInfo` without root or Shizuku.
+
 - Add a Logo size slider to the DVD screensaver demo, from 50% to 200% with the original size at 100%. Size changes save automatically and keep the logo inside its available viewport.
 
 - Bundle screensaver HTML, CSS, JavaScript, images and fonts under assets and load them on demand through the SDK. Move the DVD demo to separate files, retain its color settings and document asset validation and package limits. Raise the inline HTML limit to 512 KiB.
