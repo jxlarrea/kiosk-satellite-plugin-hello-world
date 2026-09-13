@@ -66,6 +66,7 @@ The existing authenticated command API exposes these commands:
 | --- | --- |
 | `getPluginReadings` | `id`: plugin ID. Returns current scalar entity readings without refreshing settings |
 | `getPluginCharts` | `id`: plugin ID. Returns current read-only chart snapshots |
+| `getPluginStatusTiles` | None. Returns every running plugin's Overview status tiles with the owning plugin's ID and name |
 | `getPluginState` | None. Returns the master `enabled` flag and `plugins` list |
 | `setPluginsEnabled` | `enabled`: boolean master switch |
 | `listPlugins` | None. Returns the installed plugin list |

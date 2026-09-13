@@ -45,6 +45,14 @@ public final class HelloWorldTest {
             assert "demo".equals(key); this.chart = chart; publications++;
         }
         public void removeSeries(String key) { chart = null; }
+        String tileLevel;
+        String tileText;
+        int tilePublications;
+        public void publishStatusTile(String key, String title, String level, String text) {
+            assert "demo".equals(key) && "Hello World demo".equals(title);
+            tileLevel = level; tileText = text; tilePublications++;
+        }
+        public void removeStatusTile(String key) { assert "demo".equals(key); tileLevel = null; tileText = null; }
         void awaitPublication(int previous) throws Exception {
             long end = System.nanoTime() + 4_000_000_000L;
             while (publications <= previous && System.nanoTime() < end) Thread.sleep(10);
@@ -59,9 +67,23 @@ public final class HelloWorldTest {
         settings.put("message", "Testing"); settings.put("showOnStart", true);
         settings.put("showChart", true); settings.put("amplitude", 60); settings.put("chartSize", "Regular"); settings.put("chartType", "Line");
         settings.put("pattern", "Sine"); settings.put("seriesColor", "#1976D2");
+        settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing");
         try {
             plugin.start(host, settings);
             assert host.visible && "Testing".equals(host.message);
+            assert "on".equals(host.tileLevel) && "Simulated data flowing".equals(host.tileText) && host.tilePublications == 1;
+            plugin.configure(settings);
+            assert host.tilePublications == 1 : "Unchanged settings republished the status tile";
+            settings.put("statusLevel", "Attention"); plugin.configure(settings);
+            assert "warn".equals(host.tileLevel) && host.tilePublications == 2;
+            settings.put("statusLevel", "Problem"); settings.put("statusText", " " + new String(new char[90]).replace("\0", "x") + " "); plugin.configure(settings);
+            assert "off".equals(host.tileLevel) && host.tileText.length() == 80 && host.tilePublications == 3;
+            settings.put("statusLevel", "Muted"); plugin.configure(settings);
+            assert "".equals(host.tileLevel);
+            settings.put("showStatusTile", false); plugin.configure(settings);
+            assert host.tileLevel == null && host.tilePublications == 4;
+            settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing"); plugin.configure(settings);
+            assert "on".equals(host.tileLevel) && host.tilePublications == 5;
             assert host.screensaver.get("logoColor").equals("#00D4FF");
             settings.put("dvdLogoColor", "#112233"); settings.put("dvdBackgroundColor", "#223344");
             plugin.configure(settings);

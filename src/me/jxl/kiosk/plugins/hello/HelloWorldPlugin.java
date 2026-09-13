@@ -12,9 +12,10 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, actions, live readings and a read-only chart. */
+/** Settings controls, a floating window, actions, live readings, a read-only chart and an Overview status tile. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
+    private final StatusTileDemo statusTile = new StatusTileDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
@@ -69,6 +70,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         pattern = (String) settings.get("pattern");
         seriesColor = (String) settings.get("seriesColor");
         shizuku.configure(settings);
+        statusTile.configure(host, settings);
         Map<String, Object> nextScreensaver = DvdScreensaver.options(settings);
         if (!nextScreensaver.equals(screensaverOptions)) {
             host.publishScreensaverAsset("dvd", "DVD Logo", "dvd/index.html", nextScreensaver);
@@ -182,6 +184,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         // KS revokes the host and removes its windows, charts and entities before stop.
         shizuku.stop();
         homeAssistant.stop();
+        statusTile.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;

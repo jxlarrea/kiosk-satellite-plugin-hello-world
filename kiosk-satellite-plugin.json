@@ -119,6 +119,36 @@
       "description": "Choose the read-only command to run after granting Shizuku access."
     },
     {
+      "key": "showStatusTile",
+      "type": "boolean",
+      "title": "Show status tile",
+      "default": true,
+      "group": "Status tile demo",
+      "description": "Toggle: publish a Hello World tile on the Remote Admin Overview Status panel."
+    },
+    {
+      "key": "statusLevel",
+      "type": "select",
+      "title": "Tile level",
+      "default": "Healthy",
+      "options": [
+        "Healthy",
+        "Attention",
+        "Problem",
+        "Muted"
+      ],
+      "group": "Status tile demo",
+      "description": "Selection: the dot color. Healthy is green, Attention amber, Problem red and Muted gray."
+    },
+    {
+      "key": "statusText",
+      "type": "string",
+      "title": "Tile text",
+      "default": "Simulated data flowing",
+      "group": "Status tile demo",
+      "description": "Text input: the one-line state under the tile title, up to 80 characters."
+    },
+    {
       "key": "dvdLogoSize",
       "type": "number",
       "title": "Logo size",
@@ -200,6 +230,9 @@
         "text_sensor.shizuku_status",
         "text_sensor.shizuku_output"
       ]
+    },
+    {
+      "title": "Status tile demo"
     },
     {
       "title": "Screensaver demo"

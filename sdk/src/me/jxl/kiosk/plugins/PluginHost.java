@@ -30,6 +30,10 @@ public interface PluginHost {
     default void publishSeries(String key, Map<String, Object> chart) { throw new UnsupportedOperationException("Charts are unavailable"); }
     /** Remove this session's chart with the given key. */
     default void removeSeries(String key) { throw new UnsupportedOperationException("Charts are unavailable"); }
+    /** SDK 1. Publish or update a tile on the Remote Admin Overview Status panel. Level is "on", "warn", "off" or "". */
+    default void publishStatusTile(String key, String title, String level, String text) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
+    /** Remove this session's status tile with the given key. */
+    default void removeStatusTile(String key) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
     /** Show or update this plugin's one floating window. Text is plain text. */
     void showWindow(String title, String message, String buttonLabel);
     void hideWindow();
