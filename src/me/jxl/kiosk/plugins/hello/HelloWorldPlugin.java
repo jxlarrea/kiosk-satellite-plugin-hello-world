@@ -12,10 +12,11 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, actions, live readings, a read-only chart and an Overview status tile. */
+/** Settings controls, a floating window, actions, live readings, a read-only chart, an Overview status tile and hardware keys. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
     private final StatusTileDemo statusTile = new StatusTileDemo();
+    private final KeyDemo keys = new KeyDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
@@ -71,6 +72,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         seriesColor = (String) settings.get("seriesColor");
         shizuku.configure(settings);
         statusTile.configure(host, settings);
+        keys.configure(host, settings);
         Map<String, Object> nextScreensaver = DvdScreensaver.options(settings);
         if (!nextScreensaver.equals(screensaverOptions)) {
             host.publishScreensaverAsset("dvd", "DVD Logo", "dvd/index.html", nextScreensaver);
@@ -151,6 +153,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     @Override
     public synchronized void onEvent(String event, Map<String, Object> payload) {
         homeAssistant.onEvent(event, payload);
+        keys.onEvent(event, payload);
         if ("shizuku.state".equals(event)) {
             shizuku.stateChanged();
         } else if ("window.action".equals(event)) {
@@ -185,6 +188,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         shizuku.stop();
         homeAssistant.stop();
         statusTile.stop();
+        keys.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;

@@ -167,6 +167,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `device.network` | `up`: boolean for the default network |
 | `device.volume` | No additional fields. Read `getVolume` for the current value |
 | `device.light` | `lux`: ambient light reading |
+| `device.key` | `key`: Android key name without the `KEYCODE_` prefix, such as `VOLUME_UP`. `code`: Android key code. `scanCode`: hardware scan code. `action`: `down` or `up`. `repeat`: repeat count while held. See [hardware keys](#hardware-keys) |
 | `detection.motion` | No additional fields |
 | `detection.face` | No additional fields |
 | `detection.proximity` | `held`: false on approach, true while still near |
@@ -182,6 +183,23 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 Events are passive observations. Motion, face, person, proximity and wake-word events only exist when the corresponding KS feature is already producing them. A subscription never starts a camera, opens a microphone or changes the screensaver policy. No general event-bus subscription is provided.
 
 Delivery is best effort. KS coalesces repeated events of the same type over a 100 ms window and keeps only the latest pending payload of each type while the plugin is busy. Do not use these events as an audit log or exact occurrence counter.
+
+### Hardware keys
+
+`device.key` reports the hardware keys that reach KS while it is in the foreground, such as volume, media, D-pad and remote buttons. A button without an Android key code can arrive as `UNKNOWN` with its `scanCode`. Printing and modifier keys are never reported, so typed text does not reach plugins. Keys the system handles before any app, such as power and home, are not reported either, and nothing arrives while another app is in front or the screen is off.
+
+The event is a passive observation. KS still handles the key as usual, so a plugin that controls volume itself should be paired with **Disable volume buttons** in Kiosk mode. KS then stops the system volume change and the plugin still receives every press.
+
+Key events are not coalesced. Each down, up and repeat arrives as its own event. Up to 16 presses are queued while the plugin is busy and later presses are dropped until it catches up.
+
+```java
+host.subscribe("device.key");
+
+// In KioskPlugin.onEvent:
+if (event.equals("ks.device.key") && "down".equals(payload.get("action"))) {
+    host.status("Pressed " + payload.get("key"), false);
+}
+```
 
 Entity-specific events use `ha.entity.<entity_id>` with `host.read` and arrive as `ks.ha.entity.<entity_id>`. They include an initial state, live updates and connection status. See the [Home Assistant guide](home-assistant.md) for payloads, limits and subscription cleanup.
 

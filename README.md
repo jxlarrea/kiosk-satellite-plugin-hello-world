@@ -108,6 +108,10 @@ Open the Remote Admin Overview. Its Status panel shows a **Hello World demo** ti
 
 Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver > Screensaver mode** or in a schedule entry. KS uses its stock screensaver settings and renders the bouncing DVD logo as the content. In Hello World's **Screensaver demo** group, **Logo size**, **Logo color** and **Background color** save automatically and refresh the active screensaver. The demo loads separate HTML, CSS, JavaScript and SVG files from [assets/dvd](assets/dvd). See the [screensaver guide](docs/screensavers.md) for the rendering API and lifecycle.
 
+### Try hardware keys
+
+The **Hardware keys demo** group subscribes to `device.key` while **Show hardware keys** is on. Press a volume, media or remote button with KS in the foreground. **Last hardware key** under Readings shows the key name, its scan code and a press count. Buttons without an Android key code can show as `UNKNOWN` with their scan code. See [hardware keys](docs/ks-api.md#hardware-keys) and [KeyDemo.java](src/me/jxl/kiosk/plugins/hello/KeyDemo.java).
+
 ### Try Shizuku
 
 The **Shizuku demo** group demonstrates real device diagnostics through KS's SDK. Start Shizuku and grant KS access using the **Shizuku access** row, then turn on **Enable Shizuku demo**. It is off by default. The greeting window and chart work without Shizuku.

@@ -149,6 +149,14 @@
       "description": "Text input: the one-line state under the tile title, up to 80 characters."
     },
     {
+      "key": "showKeys",
+      "type": "boolean",
+      "title": "Show hardware keys",
+      "default": true,
+      "group": "Hardware keys demo",
+      "description": "Subscribe to hardware key presses. The last key appears in Readings."
+    },
+    {
       "key": "dvdLogoSize",
       "type": "number",
       "title": "Logo size",
@@ -233,6 +241,13 @@
     },
     {
       "title": "Status tile demo"
+    },
+    {
+      "title": "Hardware keys demo",
+      "readingsTitle": "Hardware key readings",
+      "readings": [
+        "text_sensor.last_key"
+      ]
     },
     {
       "title": "Screensaver demo"

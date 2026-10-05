@@ -29,7 +29,12 @@ public final class HelloWorldTest {
         Map<String, Object> saved;
         public void publishSensor(String key, String name, Map<String, Object> metadata, Double state) { if ("wave".equals(key)) { sensor = state; assert "%".equals(metadata.get("unit")); }
             else if ("samples".equals(key)) { samples = state; assert Integer.valueOf(0).equals(metadata.get("accuracyDecimals")); } }
-        public void publishTextSensor(String key, String name, String state) { if ("status".equals(key)) text = state; else if ("summary".equals(key)) summary = state; }
+        public void publishTextSensor(String key, String name, String state) { if ("status".equals(key)) text = state; else if ("summary".equals(key)) summary = state; else if ("last_key".equals(key)) lastKey = state; }
+        volatile String lastKey;
+        final java.util.Set<String> subscriptions = new java.util.HashSet<>();
+        public void subscribe(String event) { subscriptions.add(event); }
+        public void unsubscribe(String event) { subscriptions.remove(event); }
+        public void removeTextSensor(String key) { if ("last_key".equals(key)) lastKey = null; }
         public void publishBinarySensor(String key, String name, String deviceClass, Boolean state) { binary = state; }
         public void publishSelect(String key, String name, String[] options, String state) { selection = state; assert options.length == 2; }
         public void saveSettings(Map<String, Object> values) { saved = new HashMap<>(values); }
@@ -67,7 +72,7 @@ public final class HelloWorldTest {
         settings.put("message", "Testing"); settings.put("showOnStart", true);
         settings.put("showChart", true); settings.put("amplitude", 60); settings.put("chartSize", "Regular"); settings.put("chartType", "Line");
         settings.put("pattern", "Sine"); settings.put("seriesColor", "#1976D2");
-        settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing");
+        settings.put("showKeys", true); settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing");
         try {
             plugin.start(host, settings);
             assert host.visible && "Testing".equals(host.message);
@@ -82,7 +87,7 @@ public final class HelloWorldTest {
             assert "".equals(host.tileLevel);
             settings.put("showStatusTile", false); plugin.configure(settings);
             assert host.tileLevel == null && host.tilePublications == 4;
-            settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing"); plugin.configure(settings);
+            settings.put("showKeys", true); settings.put("showStatusTile", true); settings.put("statusLevel", "Healthy"); settings.put("statusText", "Simulated data flowing"); plugin.configure(settings);
             assert "on".equals(host.tileLevel) && host.tilePublications == 5;
             assert host.screensaver.get("logoColor").equals("#00D4FF");
             settings.put("dvdLogoColor", "#112233"); settings.put("dvdBackgroundColor", "#223344");
@@ -117,6 +122,19 @@ public final class HelloWorldTest {
             assert host.summary.startsWith("Pattern: Triangle\n");
             assert ((List<?>) host.chart.get("timestamps")).size() >= 40;
             assert ((List<?>) host.chart.get("series")).size() == 2;
+            assert host.subscriptions.contains("device.key") && "Press a hardware button".equals(host.lastKey);
+            Map<String, Object> key = new HashMap<>();
+            key.put("key", "VOLUME_UP"); key.put("scanCode", 115); key.put("action", "down"); key.put("repeat", 0);
+            plugin.onEvent("ks.device.key", key);
+            key.put("repeat", 1);
+            plugin.onEvent("ks.device.key", key);
+            key.put("action", "up"); key.put("repeat", 0);
+            plugin.onEvent("ks.device.key", key);
+            assert "VOLUME_UP (scan code 115), 1 press".equals(host.lastKey) : host.lastKey;
+            Map<String, Object> noKeys = new HashMap<>(settings); noKeys.put("showKeys", false);
+            plugin.configure(noKeys);
+            assert !host.subscriptions.contains("device.key") && host.lastKey == null;
+            plugin.configure(settings);
             plugin.onEvent("window.action", Collections.emptyMap());
             assert host.message.contains("Greetings: 1");
             settings.put("message", "Updated"); plugin.configure(settings);
