@@ -1,6 +1,6 @@
 # Plugin interactions with Kiosk Satellite
 
-SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches, RGB lights and screensaver renderers are also supported.
+SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, except the volume levels `setVolume` changes, and does not manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches, RGB lights and screensaver renderers are also supported.
 
 ## Capabilities
 
@@ -33,7 +33,7 @@ host.executeCommand("isScreensaverActive", Collections.emptyMap(), (ok, data, er
 
 `executeCommand(String command, Map<String, Object> arguments, PluginHost.CommandCallback callback)` returns immediately. `onResult(boolean ok, Object data, String error)` runs later on the plugin's serialized callback worker. Data is a detached JSON-compatible value: a map, list, string, number, boolean or null. Check `ok` before reading it. On success `error` is null. Missing platform support or an unavailable feature can produce a null reading or a failed result.
 
-Except for `getBrightness` and `getHaEntityState`, every read command requires an empty arguments map. Names are case-sensitive. The read and control tables form the complete command allowlist. A new core KS command does not automatically become available to plugins.
+Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read command requires an empty arguments map. Names are case-sensitive. The read and control tables form the complete command allowlist. A new core KS command does not automatically become available to plugins.
 
 | Command | Result |
 | --- | --- |
@@ -44,7 +44,7 @@ Except for `getBrightness` and `getHaEntityState`, every read command requires a
 | `isScreenOn` | Boolean representing KS's logical screen state |
 | `getBrightness` | Brightness from 0 to 1, or null if unavailable. `{}` reads the level controlled by the Screen light. `{"panel": true}` reads current panel brightness. `{"ceiling": true}` reads the adaptive brightness ceiling. Both flags accept booleans and cannot both be true |
 | `getAmbientDisplay` | Boolean indicating whether KS has detected that the device leaves an ambient display lit after screen-off |
-| `getVolume` | Media volume percentage from 0 to 100 |
+| `getVolume` | Volume percentage from 0 to 100. `{}` reads the master volume, the device's media volume. `{"channel": "media"}`, `"assistant"` or `"intercom"` reads that share of the master volume, as set in KS's Audio Volume settings. `"master"` is also accepted |
 | `getLightLevel` | `{present, lux, live}`. Sensor availability, latest lux reading and whether readings are live. Lux can be null |
 | `getStats` | `{battery, charging, cpu, temp}`. Battery percentage, external power connected, CPU usage percentage and CPU temperature in Celsius. Unavailable numeric readings can be null |
 | `getUptime` | `{app, network}` in seconds. Network is null while offline |
@@ -122,6 +122,7 @@ host.executeCommand("showCameraView", Collections.singletonMap("viewId", "front-
 | `showNowPlaying` | `{}`. Show full-screen Now Playing when enabled and a track is loaded |
 | `hideNowPlaying` | `{}`. Dismiss full-screen Now Playing. Playback and saved preferences stay unchanged. Normal idle behavior can show it again later |
 | `sendspinControl` | `{command: "play" | "pause" | "next" | "previous"}`. Control the current Sendspin group or followed player. Does not edit queues or playlists |
+| `setVolume` | `{percent: string, channel?: string}`. Set a volume from `"0"` to `"100"`. Decimals are allowed. Without a channel, or with `"master"`, it sets the device's media volume. `"media"`, `"assistant"` and `"intercom"` set the matching KS Audio Volume slider, which is saved like a change made in Settings. The master volume has the device's own steps, often 15, so a small change can round to the current level |
 | `showAppLauncher` | `{}`. Open the configured launcher when enabled and apps exist |
 | `hideAppLauncher` | `{}`. Close the launcher overlay |
 | `showOverlayPage` | `{url: string}`. Open an HTTP or HTTPS page over the dashboard without a close button |
@@ -165,7 +166,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `screen.ambient` | `on`: boolean indicating detected ambient display behavior |
 | `device.power` | `charging`: boolean indicating external power connected |
 | `device.network` | `up`: boolean for the default network |
-| `device.volume` | No additional fields. Read `getVolume` for the current value |
+| `device.volume` | No additional fields. Fires when the master volume or the media, assistant or intercom share changes. Read `getVolume` for each channel you need |
 | `device.light` | `lux`: ambient light reading |
 | `device.key` | `key`: Android key name without the `KEYCODE_` prefix, such as `VOLUME_UP`. `code`: Android key code. `scanCode`: hardware scan code. `action`: `down` or `up`. `repeat`: repeat count while held. See [hardware keys](#hardware-keys) |
 | `detection.motion` | No additional fields |
@@ -198,6 +199,20 @@ host.subscribe("device.key");
 // In KioskPlugin.onEvent:
 if (event.equals("ks.device.key") && "down".equals(payload.get("action"))) {
     host.status("Pressed " + payload.get("key"), false);
+}
+```
+
+With `host.control`, a plugin can turn the presses into volume changes. Read the current level with `getVolume`, keep it up to date from `device.volume` and write the new one with `setVolume`:
+
+```java
+// level holds the last getVolume result for the assistant channel.
+if ("VOLUME_UP".equals(payload.get("key"))) {
+    Map<String, Object> arguments = new HashMap<>();
+    arguments.put("channel", "assistant");
+    arguments.put("percent", String.valueOf(Math.min(100, level + 10)));
+    host.executeCommand("setVolume", arguments, (ok, data, error) -> {
+        if (!ok) host.status(error, true);
+    });
 }
 ```
 
