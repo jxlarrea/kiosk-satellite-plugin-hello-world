@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add `KsTheme.styleSlider`, which styles a `SeekBar` like the Kiosk Satellite sliders, and a slider to the Hello World top bar.
+
 - Add SDK 1 native overlays: with the `overlay` capability, `host.showOverlay(key, spec, factory)` shows a plugin's own Android view over the kiosk, from a small anchored bar to a full screen panel, and `hideOverlay(key)` removes it. `OverlaySpec` sets the anchor, size, inset, whether back closes it, whether it draws on top in the voice overlay's slot over the screensaver and camera views and whether touches pass through. `KsTheme` passes the KS colors, radii, spacing and Rubik typeface, with card and pill button helpers, and restyles live overlays when the theme changes. Back sends `overlay.closed`. Add Show top bar, Hide top bar, Show full screen overlay, Show edge glow and Hide edge glow actions that demonstrate a bar, a full screen card and a visual-only animated glow on top, and an overlay guide.
 
 - Document the new limit of 50 settings per plugin, up from 20.

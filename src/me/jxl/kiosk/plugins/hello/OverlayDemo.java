@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import me.jxl.kiosk.plugins.KsTheme;
 import me.jxl.kiosk.plugins.OverlayFactory;
@@ -31,6 +32,7 @@ final class OverlayDemo {
     static final String GLOW = "glow";
     private PluginHost host;
     private volatile int greetings;
+    private volatile int level = 50;
 
     synchronized void start(PluginHost host) { this.host = host; }
 
@@ -100,16 +102,29 @@ final class OverlayDemo {
         return greetings == 0 ? "Hello World" : "Hello World · " + greetings;
     }
 
-    /** A pill with a label and two buttons. Its size follows its content. */
+    /** A pill with a label, a slider and two buttons. Its size follows its content. */
     private final class Bar implements OverlayFactory {
         @Override public View create(Context context, KsTheme theme) {
             LinearLayout root = new LinearLayout(context);
             root.setOrientation(LinearLayout.HORIZONTAL);
             root.setGravity(Gravity.CENTER_VERTICAL);
             TextView label = new TextView(context);
+            SeekBar slider = new SeekBar(context);
+            TextView value = new TextView(context);
             Button hello = new Button(context);
             Button full = new Button(context);
             label.setText(greeting());
+            slider.setMax(100);
+            slider.setProgress(level);
+            value.setText(level + "%");
+            slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
+                    level = progress;
+                    value.setText(progress + "%");
+                }
+                @Override public void onStartTrackingTouch(SeekBar bar) {}
+                @Override public void onStopTrackingTouch(SeekBar bar) {}
+            });
             hello.setText("Say hello");
             full.setText("Full screen");
             hello.setOnClickListener(view -> {
@@ -118,6 +133,12 @@ final class OverlayDemo {
             });
             full.setOnClickListener(view -> tap(OverlayDemo.this::showFull));
             root.addView(label);
+            LinearLayout.LayoutParams track = new LinearLayout.LayoutParams(theme.px(180), LinearLayout.LayoutParams.WRAP_CONTENT);
+            track.setMarginStart(theme.px(12));
+            root.addView(slider, track);
+            // Wide enough for 100% so the bar does not resize while dragging.
+            value.setMinWidth(theme.px(44));
+            root.addView(value);
             LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             gap.setMarginStart(theme.px(8));
             root.addView(hello, gap);
@@ -133,8 +154,10 @@ final class OverlayDemo {
             root.setBackground(pill);
             root.setPadding(theme.px(20), theme.px(8), theme.px(8), theme.px(8));
             theme.styleText((TextView) root.getChildAt(0), 15, 500, "onSurface");
-            theme.stylePill((TextView) root.getChildAt(1), true);
-            theme.stylePill((TextView) root.getChildAt(2), false);
+            theme.styleSlider((SeekBar) root.getChildAt(1));
+            theme.styleText((TextView) root.getChildAt(2), 14, 500, "onSurfaceVariant");
+            theme.stylePill((TextView) root.getChildAt(3), true);
+            theme.stylePill((TextView) root.getChildAt(4), false);
         }
     }
 

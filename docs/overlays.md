@@ -77,6 +77,7 @@ The view is drawn into a texture that KS composites with the rest of its screen.
 | `card()` | A background like the one KS toasts use over the dashboard: `surfaceContainerHigh`, the card radius and a hairline outline |
 | `styleText(view, sp, weight, role)` | Applies the typeface, size and a color role to a `TextView` |
 | `stylePill(view, filled)` | Turns a `TextView` or `Button` into a KS pill button. Filled uses `primary`, otherwise it is a quiet text button |
+| `styleSlider(seekBar)` | Styles a `SeekBar` like the KS sliders: a 4 dp track filled in `primary` over `surfaceContainerHighest`, a 20 dp `primary` thumb and a 44 dp touch target |
 
 The context passed to `create` carries the matching Android `DeviceDefault` light or dark theme, so stock widgets start close to KS. The theme does not change that context later, so restyle in `onThemeChanged`.
 
@@ -106,7 +107,7 @@ An exception thrown from `create`, `onThemeChanged` or `onDestroy` disables the 
 
 ## Hello World demo
 
-Hello World's actions show each kind. **Show top bar** puts a wrapped pill at the top of the kiosk with a greeting counter, a filled **Say hello** button and a quiet **Full screen** button. Back leaves the bar alone, and **Hide top bar** removes it. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
+Hello World's actions show each kind. **Show top bar** puts a wrapped pill at the top of the kiosk with a greeting counter, a slider with its value, a filled **Say hello** button and a quiet **Full screen** button. Back leaves the bar alone, and **Hide top bar** removes it. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
 
 ## Updating an existing plugin repository
 

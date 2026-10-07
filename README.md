@@ -103,7 +103,7 @@ Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/e
 
 ### Try native overlays
 
-Run the **Show top bar** action from Hello World's subpage, a gesture or a drawer shortcut. A pill appears at the top of the dashboard with a greeting counter, a **Say hello** button and a **Full screen** button. It is a native Android view drawn with the KS theme. Back leaves it alone and **Hide top bar** removes it. **Full screen**, or the **Show full screen overlay** action, opens a card over a dimmed kiosk. Close it with back, its **Close** button or a tap outside the card. **Show edge glow** draws an animated glow along the screen edges, over the screensaver and camera views like the voice overlay, while every tap still reaches the dashboard. Back or **Hide edge glow** removes it. See the [overlay guide](docs/overlays.md) and [OverlayDemo.java](src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
+Run the **Show top bar** action from Hello World's subpage, a gesture or a drawer shortcut. A pill appears at the top of the dashboard with a greeting counter, a slider, a **Say hello** button and a **Full screen** button. It is a native Android view drawn with the KS theme. Back leaves it alone and **Hide top bar** removes it. **Full screen**, or the **Show full screen overlay** action, opens a card over a dimmed kiosk. Close it with back, its **Close** button or a tap outside the card. **Show edge glow** draws an animated glow along the screen edges, over the screensaver and camera views like the voice overlay, while every tap still reaches the dashboard. Back or **Hide edge glow** removes it. See the [overlay guide](docs/overlays.md) and [OverlayDemo.java](src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
 
 ### Try the status tile
 

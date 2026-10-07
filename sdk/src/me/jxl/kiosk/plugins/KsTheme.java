@@ -4,10 +4,14 @@ package me.jxl.kiosk.plugins;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,5 +104,34 @@ public final class KsTheme {
         view.setMinHeight(px(44));
         view.setMinimumHeight(px(44));
         view.setStateListAnimator(null);
+    }
+
+    /** Style a SeekBar like the KS sliders: a 4 dp track filled in primary over surfaceContainerHighest and a 20 dp primary thumb. */
+    public void styleSlider(SeekBar view) {
+        int track = px(4);
+        GradientDrawable empty = new GradientDrawable();
+        empty.setCornerRadius(track / 2f);
+        empty.setColor(color("surfaceContainerHighest"));
+        GradientDrawable filled = new GradientDrawable();
+        filled.setCornerRadius(track / 2f);
+        filled.setColor(color("primary"));
+        LayerDrawable progress = new LayerDrawable(new Drawable[] {empty, new ClipDrawable(filled, Gravity.START, ClipDrawable.HORIZONTAL)});
+        progress.setId(0, android.R.id.background);
+        progress.setId(1, android.R.id.progress);
+        for (int layer = 0; layer < 2; layer++) {
+            progress.setLayerHeight(layer, track);
+            progress.setLayerGravity(layer, Gravity.CENTER_VERTICAL | Gravity.FILL_HORIZONTAL);
+        }
+        view.setProgressDrawable(progress);
+        GradientDrawable thumb = new GradientDrawable();
+        thumb.setShape(GradientDrawable.OVAL);
+        thumb.setColor(color("primary"));
+        thumb.setSize(px(20), px(20));
+        view.setThumb(thumb);
+        view.setSplitTrack(false);
+        view.setBackground(null);
+        // The thumb's half width on each side, and a 44 dp touch target.
+        view.setPadding(px(10), 0, px(10), 0);
+        view.setMinimumHeight(px(44));
     }
 }
