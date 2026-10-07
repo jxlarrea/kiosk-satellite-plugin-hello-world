@@ -116,6 +116,10 @@ The **Hardware keys demo** group subscribes to `device.key` while **Show hardwar
 
 The **Voice Satellite demo** group subscribes to `voice.state` while **Show Voice Satellite state** is on. With the native Voice Satellite runtime enabled, say the wake word. **Voice Satellite state** under Readings moves through listening, processing and responding and back to idle, for Assist turns and realtime conversations alike. See [Voice Satellite state](docs/ks-api.md#voice-satellite-state) and [VoiceDemo.java](src/me/jxl/kiosk/plugins/hello/VoiceDemo.java).
 
+### Try intercom state
+
+The **Intercom demo** group subscribes to `intercom.state` while **Show intercom state** is on. With the intercom on, call this kiosk from another one. **Intercom state** under Readings shows ringing, the call and its end, with the other kiosk's name. See [Intercom state](docs/ks-api.md#intercom-state) and [IntercomDemo.java](src/me/jxl/kiosk/plugins/hello/IntercomDemo.java).
+
 ### Try Shizuku
 
 The **Shizuku demo** group demonstrates real device diagnostics through KS's SDK. Start Shizuku and grant KS access using the **Shizuku access** row, then turn on **Enable Shizuku demo**. It is off by default. The greeting window and chart work without Shizuku.

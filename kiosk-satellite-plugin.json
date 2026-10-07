@@ -165,6 +165,14 @@
       "description": "Follow this kiosk's voice turns: idle, listening, processing or responding. The state appears in Readings."
     },
     {
+      "key": "showIntercom",
+      "type": "boolean",
+      "title": "Show intercom state",
+      "default": true,
+      "group": "Intercom demo",
+      "description": "Follow this kiosk's intercom calls and announcements. The state appears in Readings."
+    },
+    {
       "key": "dvdLogoSize",
       "type": "number",
       "title": "Logo size",
@@ -268,6 +276,13 @@
       "readingsTitle": "Voice Satellite readings",
       "readings": [
         "text_sensor.voice_state"
+      ]
+    },
+    {
+      "title": "Intercom demo",
+      "readingsTitle": "Intercom readings",
+      "readings": [
+        "text_sensor.intercom_state"
       ]
     },
     {

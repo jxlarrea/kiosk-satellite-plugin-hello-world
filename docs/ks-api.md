@@ -56,6 +56,7 @@ Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read comma
 | `getCameraViewState` | `{active, viewId, viewName, focusedCameraId}` for the existing camera overlay. IDs and name can be null. No images or stream URLs |
 | `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
 | `getVoiceState` | `{enabled, state}`. `enabled` is true while the native Voice Satellite runtime is on. `state` is `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
+| `getIntercomState` | `{enabled, state, kiosk, dnd}`. `enabled` is true while the intercom is on. See [Intercom state](#intercom-state) |
 | `getHaEntityState` | `{entityId: string}` arguments. Returns `{entityId, status, state, attributes, lastChanged, lastUpdated}`. Read-only HA entity snapshot. See the [Home Assistant guide](home-assistant.md) |
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
@@ -177,6 +178,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `detection.presence` | `present`: boolean from the device person sensor |
 | `voice.interaction` | `active`: boolean, `source`: `page`, `sendspin` or `command`. No speech or conversation content |
 | `voice.state` | `state`: `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
+| `intercom.state` | `state`, `kiosk` and `dnd`. See [Intercom state](#intercom-state) |
 | `wakeword.state` | `active`, `listening` and `muted`: booleans |
 | `wakeword.detected` | `model` and `phrase`: wake-word identifiers. No captured audio |
 | `stopword.detected` | No additional fields |
@@ -246,6 +248,25 @@ if (event.equals("ks.voice.state")) showState((String) payload.get("state"));
 ```
 
 Older KS versions reject the `voice.state` subscription with `IllegalArgumentException`. See [VoiceDemo.java](../src/me/jxl/kiosk/plugins/hello/VoiceDemo.java) for a complete example that handles both.
+
+### Intercom state
+
+`intercom.state` follows this kiosk's intercom, the same values as the **Intercom**, **Intercom kiosk** and **Intercom do not disturb** entities on its ESPHome device. Use it for a call light or a ring indicator.
+
+| State | Meaning |
+| --- | --- |
+| `idle` | No call |
+| `calling` | This kiosk is ringing another kiosk |
+| `ringing` | Another kiosk is ringing this one |
+| `in_call` | A call is live |
+| `broadcasting` | This kiosk is announcing to every kiosk |
+| `listening` | Another kiosk's announcement is playing here |
+| `ended` | A call or announcement just ended. Holds for a few seconds before `idle` |
+| `missed` | A call nobody answered. Holds for a minute before `idle` |
+
+`kiosk` is the other kiosk's name during a call and the caller's through `missed`, else an empty string. `dnd` is true while Do not disturb holds, from the answer mode or Lockdown Mode.
+
+The event fires only when one of the three values changes. While the intercom is off, `getIntercomState` returns `enabled: false` and no events arrive. Read `getIntercomState` once after subscribing and let an event win over an older read, the same as [Voice Satellite state](#voice-satellite-state). No audio, call IDs or kiosk addresses are included. Older KS versions reject the subscription with `IllegalArgumentException`. See [IntercomDemo.java](../src/me/jxl/kiosk/plugins/hello/IntercomDemo.java).
 
 Entity-specific events use `ha.entity.<entity_id>` with `host.read` and arrive as `ks.ha.entity.<entity_id>`. They include an initial state, live updates and connection status. See the [Home Assistant guide](home-assistant.md) for payloads, limits and subscription cleanup.
 
