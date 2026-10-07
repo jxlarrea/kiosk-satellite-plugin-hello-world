@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add the SDK 1 `getVoiceState` read and `voice.state` event, which follow this kiosk's Voice Satellite turns through idle, listening, processing and responding, realtime conversations included. Add a Voice Satellite demo group that shows the state under Readings while Show Voice Satellite state is on. Document the states, the read and event pairing and the fallback for older Kiosk Satellite versions.
+
 - Add SDK 1 gesture triggers: declare `triggers` in the manifest and call `host.fireTrigger(id)` so a gesture mapped to the trigger runs its action. The Hardware keys demo declares a Hardware key trigger and fires it for each press. Document the manifest field, the four fires per second limit, the errors and the fallback for older Kiosk Satellite versions.
 
 - Document the SDK 1 `setVolume` control and the `channel` argument of `getVolume`, covering the master, media, assistant and intercom volumes, and the `device.volume` event now firing for all four.

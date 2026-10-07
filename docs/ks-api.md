@@ -55,6 +55,7 @@ Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read comma
 | `getProximityEnabled` | Boolean indicating whether proximity detection is enabled |
 | `getCameraViewState` | `{active, viewId, viewName, focusedCameraId}` for the existing camera overlay. IDs and name can be null. No images or stream URLs |
 | `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
+| `getVoiceState` | `{enabled, state}`. `enabled` is true while the native Voice Satellite runtime is on. `state` is `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
 | `getHaEntityState` | `{entityId: string}` arguments. Returns `{entityId, status, state, attributes, lastChanged, lastUpdated}`. Read-only HA entity snapshot. See the [Home Assistant guide](home-assistant.md) |
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
@@ -175,6 +176,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `detection.person` | `held`: false on arrival, true while presence continues |
 | `detection.presence` | `present`: boolean from the device person sensor |
 | `voice.interaction` | `active`: boolean, `source`: `page`, `sendspin` or `command`. No speech or conversation content |
+| `voice.state` | `state`: `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
 | `wakeword.state` | `active`, `listening` and `muted`: booleans |
 | `wakeword.detected` | `model` and `phrase`: wake-word identifiers. No captured audio |
 | `stopword.detected` | No additional fields |
@@ -217,6 +219,33 @@ if ("VOLUME_UP".equals(payload.get("key"))) {
     });
 }
 ```
+
+### Voice Satellite state
+
+`voice.state` follows this kiosk's own Voice Satellite turns, the same value as the **Voice Satellite** sensor on its ESPHome device. Use it to drive an LED ring or any other indicator without asking the user to pick an entity.
+
+| State | Meaning |
+| --- | --- |
+| `idle` | No turn in progress |
+| `listening` | The microphone is capturing the request |
+| `processing` | The request is with the assistant |
+| `responding` | The answer or an announcement is playing |
+
+It covers realtime conversations too. A realtime conversation runs no Assist pipeline, so Home Assistant's `assist_satellite` entity stays at `idle` through it while `voice.state` moves through listening and responding as the conversation goes. Following `voice.state` also needs no Home Assistant connection and does not break when the device or its entities are renamed.
+
+The state comes from the native Voice Satellite runtime. While it is off, `getVoiceState` returns `enabled: false` with `state: "idle"` and no events arrive. The event only fires on changes, so read `getVoiceState` once after subscribing. A change can arrive before the read returns, so let an event win over an older read. No speech, transcript or answer text is included.
+
+```java
+host.subscribe("voice.state");
+host.executeCommand("getVoiceState", Collections.emptyMap(), (ok, data, error) -> {
+    if (ok) showState((String) ((Map<?, ?>) data).get("state"));
+});
+
+// In KioskPlugin.onEvent:
+if (event.equals("ks.voice.state")) showState((String) payload.get("state"));
+```
+
+Older KS versions reject the `voice.state` subscription with `IllegalArgumentException`. See [VoiceDemo.java](../src/me/jxl/kiosk/plugins/hello/VoiceDemo.java) for a complete example that handles both.
 
 Entity-specific events use `ha.entity.<entity_id>` with `host.read` and arrive as `ks.ha.entity.<entity_id>`. They include an initial state, live updates and connection status. See the [Home Assistant guide](home-assistant.md) for payloads, limits and subscription cleanup.
 

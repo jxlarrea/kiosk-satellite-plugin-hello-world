@@ -112,6 +112,10 @@ Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver >
 
 The **Hardware keys demo** group subscribes to `device.key` while **Show hardware keys** is on. Press a volume, media or remote button with KS in the foreground. **Last hardware key** under Readings shows the key name, its scan code and a press count. Buttons without an Android key code can show as `UNKNOWN` with their scan code. Each press also fires the **Hardware key** gesture trigger, so a gesture set to **Plugin trigger > Hello World: Hardware key** under **Gestures** runs its action. See [hardware keys](docs/ks-api.md#hardware-keys), [gesture triggers](docs/creating-plugins.md#gesture-triggers) and [KeyDemo.java](src/me/jxl/kiosk/plugins/hello/KeyDemo.java).
 
+### Try Voice Satellite state
+
+The **Voice Satellite demo** group subscribes to `voice.state` while **Show Voice Satellite state** is on. With the native Voice Satellite runtime enabled, say the wake word. **Voice Satellite state** under Readings moves through listening, processing and responding and back to idle, for Assist turns and realtime conversations alike. See [Voice Satellite state](docs/ks-api.md#voice-satellite-state) and [VoiceDemo.java](src/me/jxl/kiosk/plugins/hello/VoiceDemo.java).
+
 ### Try Shizuku
 
 The **Shizuku demo** group demonstrates real device diagnostics through KS's SDK. Start Shizuku and grant KS access using the **Shizuku access** row, then turn on **Enable Shizuku demo**. It is off by default. The greeting window and chart work without Shizuku.

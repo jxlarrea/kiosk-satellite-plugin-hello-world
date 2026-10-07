@@ -157,6 +157,14 @@
       "description": "Subscribe to hardware key presses. The last key appears in Readings."
     },
     {
+      "key": "showVoice",
+      "type": "boolean",
+      "title": "Show Voice Satellite state",
+      "default": true,
+      "group": "Voice Satellite demo",
+      "description": "Follow this kiosk's voice turns: idle, listening, processing or responding. The state appears in Readings."
+    },
+    {
       "key": "dvdLogoSize",
       "type": "number",
       "title": "Logo size",
@@ -253,6 +261,13 @@
       "readingsTitle": "Hardware key readings",
       "readings": [
         "text_sensor.last_key"
+      ]
+    },
+    {
+      "title": "Voice Satellite demo",
+      "readingsTitle": "Voice Satellite readings",
+      "readings": [
+        "text_sensor.voice_state"
       ]
     },
     {

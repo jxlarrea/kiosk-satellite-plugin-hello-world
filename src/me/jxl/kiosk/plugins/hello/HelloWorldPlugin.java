@@ -12,11 +12,12 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, actions, live readings, a read-only chart, an Overview status tile and hardware keys. */
+/** Settings controls, a floating window, actions, live readings, a read-only chart, an Overview status tile, hardware keys and Voice Satellite state. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
     private final StatusTileDemo statusTile = new StatusTileDemo();
     private final KeyDemo keys = new KeyDemo();
+    private final VoiceDemo voice = new VoiceDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
@@ -73,6 +74,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         shizuku.configure(settings);
         statusTile.configure(host, settings);
         keys.configure(host, settings);
+        voice.configure(host, settings);
         Map<String, Object> nextScreensaver = DvdScreensaver.options(settings);
         if (!nextScreensaver.equals(screensaverOptions)) {
             host.publishScreensaverAsset("dvd", "DVD Logo", "dvd/index.html", nextScreensaver);
@@ -154,6 +156,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     public synchronized void onEvent(String event, Map<String, Object> payload) {
         homeAssistant.onEvent(event, payload);
         keys.onEvent(event, payload);
+        voice.onEvent(event, payload);
         if ("shizuku.state".equals(event)) {
             shizuku.stateChanged();
         } else if ("window.action".equals(event)) {
@@ -189,6 +192,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         homeAssistant.stop();
         statusTile.stop();
         keys.stop();
+        voice.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;
