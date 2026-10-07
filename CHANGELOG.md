@@ -4,6 +4,12 @@
 
 ### Added
 
+- Add SDK 1 native overlays: with the `overlay` capability, `host.showOverlay(key, spec, factory)` shows a plugin's own Android view over the kiosk, from a small anchored bar to a full screen panel, and `hideOverlay(key)` removes it. `OverlaySpec` sets the anchor, size, inset, whether back closes it, whether it draws on top in the voice overlay's slot over the screensaver and camera views and whether touches pass through. `KsTheme` passes the KS colors, radii, spacing and Rubik typeface, with card and pill button helpers, and restyles live overlays when the theme changes. Back sends `overlay.closed`. Add Show top bar, Hide top bar, Show full screen overlay, Show edge glow and Hide edge glow actions that demonstrate a bar, a full screen card and a visual-only animated glow on top, and an overlay guide.
+
+- Document the new limit of 50 settings per plugin, up from 20.
+
+- Compile the SDK against the Android platform in `tools/build.py` and `tools/test.py`, since the overlay classes use Android views.
+
 - Add the SDK 1 `getIntercomState` read and `intercom.state` event, which follow this kiosk's intercom with the same state, other kiosk and Do not disturb values as its ESPHome entities. Add an Intercom demo group that shows them under Readings while Show intercom state is on. Document the states and how long ended and missed hold.
 
 - Add the SDK 1 `getVoiceState` read and `voice.state` event, which follow this kiosk's Voice Satellite turns through idle, listening, processing and responding, realtime conversations included. Add a Voice Satellite demo group that shows the state under Readings while Show Voice Satellite state is on. Document the states, the read and event pairing and the fallback for older Kiosk Satellite versions.

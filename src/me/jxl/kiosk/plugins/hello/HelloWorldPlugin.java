@@ -12,13 +12,14 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, actions, live readings, a read-only chart, an Overview status tile, hardware keys, Voice Satellite state and intercom state. */
+/** Settings controls, a floating window, native overlays, actions, live readings, a read-only chart, an Overview status tile, hardware keys, Voice Satellite state and intercom state. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
     private final StatusTileDemo statusTile = new StatusTileDemo();
     private final KeyDemo keys = new KeyDemo();
     private final VoiceDemo voice = new VoiceDemo();
     private final IntercomDemo intercom = new IntercomDemo();
+    private final OverlayDemo overlays = new OverlayDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
     private Map<String, Object> savedSettings;
@@ -41,6 +42,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
     @Override
     public synchronized void start(PluginHost host, Map<String, Object> settings) {
         this.host = host;
+        overlays.start(host);
         configure(settings);
         shizuku.start(host, settings);
         host.log("Hello World started");
@@ -148,6 +150,11 @@ public final class HelloWorldPlugin implements KioskPlugin {
     @Override
     public synchronized void execute(String command, Map<String, Object> arguments) {
         if ("show".equals(command)) show();
+        else if ("showOverlayBar".equals(command)) overlays.showBar();
+        else if ("hideOverlayBar".equals(command)) overlays.hideBar();
+        else if ("showFullOverlay".equals(command)) overlays.showFull();
+        else if ("showGlow".equals(command)) overlays.showGlow();
+        else if ("hideGlow".equals(command)) overlays.hideGlow();
         else if ("hide".equals(command)) {
             visible = false;
             host.hideWindow();
@@ -197,6 +204,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         keys.stop();
         voice.stop();
         intercom.stop();
+        overlays.stop();
         if (sampler != null) { sampler.shutdownNow(); sampler = null; }
         times.clear(); wave.clear(); reference.clear(); phase = 0;
         visible = false;

@@ -1,6 +1,6 @@
 # Creating plugins
 
-SDK 1 lets a plugin display one floating window, receive window events, expose commands and save settings. Start with Hello World and build a ZIP with `tools/build.py`.
+SDK 1 lets a plugin display one floating window and its own native overlays, receive window events, expose commands and save settings. Start with Hello World and build a ZIP with `tools/build.py`.
 
 ## Build and check the SDK
 
@@ -14,7 +14,7 @@ python3 tools/check-sdk.py /path/to/kiosk-satellite
 
 Release builds pass `--android-platform 35` to use the platform installed by the workflow, regardless of newer platforms already on the runner. Local builds can pass the same option or omit it to choose the highest installed numeric platform version, including dotted names such as `37.0`. Preview and extension directory names are skipped during automatic selection.
 
-The SDK check compares this repository's interfaces and license with the application's copy. Keep the SDK as a compile-time dependency. The application supplies those interfaces at runtime.
+The SDK check compares this repository's interfaces and license with the application's copy. Keep the SDK as a compile-time dependency. The application supplies those interfaces at runtime. The [native overlay](overlays.md) classes use Android views, so the build and test tools compile the SDK against the Android platform.
 
 The SDK, template, tooling and documentation use [Apache-2.0](../LICENSE). Contributors retain copyright to their work and contribute under the license of the component they change. Plugins may choose their own license and must retain any required third-party notices.
 
@@ -94,7 +94,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
 | `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control`, `shizuku` and `screensaver` |
-| `settings` | Up to 20 settings |
+| `settings` | Up to 50 settings. Kiosk Satellite versions without native overlays accept up to 20 |
 | `commands` | Up to 20 named commands |
 | `triggers` | Up to 20 named [gesture triggers](#gesture-triggers) |
 
@@ -138,7 +138,7 @@ Implement `me.jxl.kiosk.plugins.KioskPlugin`:
 | `start(host, settings)` | Save the host handle and acquire resources |
 | `configure(settings)` | Apply the complete validated configuration |
 | `execute(command, arguments)` | Run a declared command. SDK 1 passes an empty arguments map |
-| `onEvent(event, payload)` | Handle a window event, RGB command or subscribed KS event. See the [complete interaction reference](ks-api.md) |
+| `onEvent(event, payload)` | Handle a window or overlay event, RGB command or subscribed KS event. See the [complete interaction reference](ks-api.md) |
 | `stop()` | Release timers, threads and resources |
 
 Callbacks run serially on a worker dedicated to the plugin. They must finish within three seconds. The host disables a plugin after a callback error or timeout. Keep long work asynchronous and honor interruption. Host access is revoked after the plugin stops. SDK 1 read and subscription calls made after revocation throw. A timed-out thread can keep running if it ignores interruption, since this runtime does not isolate plugin code.
@@ -162,6 +162,10 @@ host.log("A short diagnostic message");
 The action button sends `window.action`. Closing the window sends `window.closed`. Closing does not disable the plugin. Calling `hideWindow` does not send a close event, so plugins can manage visibility without a callback loop.
 
 The window floats over the dashboard and is draggable by its title bar. Other kiosk surfaces, including the drawer and screensaver, can cover it. It does not create an Android system overlay. No dashboard DOM access, custom HTML or arbitrary Flutter widget loading is provided.
+
+## Native overlays
+
+For anything beyond a text window, draw your own Android views with `showOverlay`. A bar at the top of the kiosk and a full screen panel both work, styled with the KS colors, shapes and typeface. See [native overlays](overlays.md).
 
 ## Trust and compatibility
 

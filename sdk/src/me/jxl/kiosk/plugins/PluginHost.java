@@ -36,6 +36,10 @@ public interface PluginHost {
     default void removeStatusTile(String key) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
     /** SDK 1. Fire a trigger declared in the manifest. Gestures mapped to it run their actions. At most four per second, extras are dropped. */
     default void fireTrigger(String id) { throw new UnsupportedOperationException("Gesture triggers are unavailable"); }
+    /** SDK 1, overlay. Show a native overlay, or replace the one with this key. KS builds its view on the main thread through the factory. At most four per plugin. */
+    default void showOverlay(String key, OverlaySpec spec, OverlayFactory factory) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
+    /** SDK 1, overlay. Remove an overlay. Unknown keys are ignored. */
+    default void hideOverlay(String key) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
     /** Show or update this plugin's one floating window. Text is plain text. */
     void showWindow(String title, String message, String buttonLabel);
     void hideWindow();

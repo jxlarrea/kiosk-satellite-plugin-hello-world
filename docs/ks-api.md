@@ -8,7 +8,7 @@ Every plugin declares `"apiVersion": 1`. All features below belong to that singl
 
 | Manifest capability | Host interaction |
 | --- | --- |
-| `overlay` | Show or update the plugin's floating window |
+| `overlay` | Show or update the plugin's floating window and [native overlays](overlays.md) |
 | `screensaver` | Register rendering content inside the stock screensaver system |
 | None | Hide its window, log, publish runtime status and charts, save its own settings and receive declared actions |
 | `native` | Locate its verified packaged JNI library and DEX container |
@@ -289,6 +289,8 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | --- | --- |
 | `showWindow(title, message, buttonLabel)` | One draggable plain-text window per plugin above the dashboard. Title is 1 to 80 characters, message at most 4096 and button label at most 80. An empty label hides its button |
 | `hideWindow()` | Removes that plugin's window |
+| `showOverlay(key, spec, factory)` | With `overlay`, show or replace a native Android view over the kiosk. Up to four per session. See [native overlays](overlays.md) |
+| `hideOverlay(key)` | Removes that overlay. Unknown keys are ignored |
 | `log(message)` | Plugin-prefixed diagnostic log, truncated to 1000 characters |
 | `status(message, error)` | Runtime status in the plugin subpage, at most 1000 characters. Not persisted |
 | `publishScreensaverAsset(key, title, entry, data)` | With `screensaver`, register an HTML asset and scalar rendering options. Bundled resources load on demand from the verified package. See [screensavers](screensavers.md). |
@@ -310,6 +312,7 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `execute(command, arguments)` | Receives a declared action invoked by a gesture, drawer shortcut, ESPHome button or authenticated API. Arguments are currently empty |
 | `onEvent("window.action", payload)` | The plugin window's button was pressed. Empty payload |
 | `onEvent("window.closed", payload)` | The user dismissed its window. Empty payload |
+| `onEvent("overlay.closed", payload)` | Back closed one of its overlays. `key` names it |
 | `onEvent("light.KEY", payload)` | A command for its RGB light, containing the supplied fields from `on`, `brightness`, `red`, `green`, `blue` and `effect` |
 | `onEvent("ks.NAME", payload)` | A subscribed SDK 1 event from the table above |
 | `stop()` | Ends the session. Release timers, threads and hardware handles |

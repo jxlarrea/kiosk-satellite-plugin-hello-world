@@ -20,9 +20,10 @@ All documented features use **SDK 1**, the first public plugin SDK. Plugins requ
 - [Shizuku](docs/shizuku.md): optional shell or root commands through KS, explicit permission, the Hello World demo and a minimal example.
 - [Charts](docs/charts.md): publish line and bar charts, inspect samples and update an existing plugin to use charts.
 - [Status tiles](docs/status-tiles.md): put a health verdict on the Remote Admin Overview Status panel.
+- [Native overlays](docs/overlays.md): draw Android views over the kiosk, from a small bar to a full screen panel, with the KS theme.
 - [Sensors, selects and switches](docs/entities.md): show live readings in KS, publish them to Home Assistant and handle writable controls.
 - [Dashboard URLs](docs/dashboard.md): discover the configured server and current view without duplicating URL settings.
-- [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces supplied by Kiosk Satellite at runtime.
+- [SDK source](sdk/src/me/jxl/kiosk/plugins): the `KioskPlugin` and `PluginHost` interfaces and the overlay classes supplied by Kiosk Satellite at runtime.
 - [Read-only example](examples/read-only): a buildable plugin that observes screen, screensaver and dashboard state.
 
 ## Get started
@@ -99,6 +100,10 @@ Open **Plugin Manager > Hello World** on-device or in Remote Admin. **Readings**
 With ESPHome and native entities enabled in KS, Hello World also exposes **Simulated wave** as a numeric sensor, **Demo status** as a text sensor, **Demo chart active** as a binary sensor, **Demo pattern** as a select and **Demo chart** as a switch. The numeric value follows the chart and becomes unknown when the chart is hidden. Changing Demo pattern in Home Assistant updates the plugin's Pattern setting and its next samples. Demo chart controls the same Show demo chart setting used in the subpage. These chart readings are simulated. The optional Shizuku diagnostics below read the device.
 
 Use the ESPHome entity picker to exclude any of these. The [entity guide](docs/entities.md) explains how to publish your own readings and handle select and switch requests.
+
+### Try native overlays
+
+Run the **Show top bar** action from Hello World's subpage, a gesture or a drawer shortcut. A pill appears at the top of the dashboard with a greeting counter, a **Say hello** button and a **Full screen** button. It is a native Android view drawn with the KS theme. Back leaves it alone and **Hide top bar** removes it. **Full screen**, or the **Show full screen overlay** action, opens a card over a dimmed kiosk. Close it with back, its **Close** button or a tap outside the card. **Show edge glow** draws an animated glow along the screen edges, over the screensaver and camera views like the voice overlay, while every tap still reaches the dashboard. Back or **Hide edge glow** removes it. See the [overlay guide](docs/overlays.md) and [OverlayDemo.java](src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
 
 ### Try the status tile
 

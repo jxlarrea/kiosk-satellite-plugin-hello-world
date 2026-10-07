@@ -217,6 +217,26 @@
     {
       "id": "hide",
       "title": "Hide window"
+    },
+    {
+      "id": "showOverlayBar",
+      "title": "Show top bar"
+    },
+    {
+      "id": "hideOverlayBar",
+      "title": "Hide top bar"
+    },
+    {
+      "id": "showFullOverlay",
+      "title": "Show full screen overlay"
+    },
+    {
+      "id": "showGlow",
+      "title": "Show edge glow"
+    },
+    {
+      "id": "hideGlow",
+      "title": "Hide edge glow"
     }
   ],
   "triggers": [

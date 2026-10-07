@@ -48,7 +48,8 @@ with tempfile.TemporaryDirectory(prefix='kiosk-plugin-') as temp:
     sdk_classes, classes, dex = [temp / name for name in ('sdk', 'classes', 'dex')]
     for folder in (sdk_classes, classes, dex):
         folder.mkdir()
-    subprocess.run([java_tool('javac'), '--release', '8', '-d', str(sdk_classes), *map(str, sorted((ROOT / 'sdk/src').rglob('*.java')))], check=True)
+    # The overlay classes use Android views, so the SDK compiles against the platform too.
+    subprocess.run([java_tool('javac'), '--release', '8', '-cp', str(platform), '-d', str(sdk_classes), *map(str, sorted((ROOT / 'sdk/src').rglob('*.java')))], check=True)
     sdk_jar = out / 'kiosk-plugin-sdk-1.jar'
     subprocess.run([java_tool('jar'), 'cf', str(sdk_jar), '-C', str(sdk_classes), '.'], check=True)
     subprocess.run([java_tool('javac'), '--release', '8', '-cp', os.pathsep.join([str(sdk_jar), str(platform)]), '-d', str(classes), *map(str, sorted((plugin / 'src').rglob('*.java')))], check=True)
