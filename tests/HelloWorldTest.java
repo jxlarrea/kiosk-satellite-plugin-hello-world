@@ -35,6 +35,8 @@ public final class HelloWorldTest {
         public void subscribe(String event) { subscriptions.add(event); }
         public void unsubscribe(String event) { subscriptions.remove(event); }
         public void removeTextSensor(String key) { if ("last_key".equals(key)) lastKey = null; }
+        final List<String> triggers = new java.util.ArrayList<>();
+        public void fireTrigger(String id) { triggers.add(id); }
         public void publishBinarySensor(String key, String name, String deviceClass, Boolean state) { binary = state; }
         public void publishSelect(String key, String name, String[] options, String state) { selection = state; assert options.length == 2; }
         public void saveSettings(Map<String, Object> values) { saved = new HashMap<>(values); }
@@ -131,6 +133,7 @@ public final class HelloWorldTest {
             key.put("action", "up"); key.put("repeat", 0);
             plugin.onEvent("ks.device.key", key);
             assert "VOLUME_UP (scan code 115), 1 press".equals(host.lastKey) : host.lastKey;
+            assert Collections.singletonList("hardwareKey").equals(host.triggers) : host.triggers;
             Map<String, Object> noKeys = new HashMap<>(settings); noKeys.put("showKeys", false);
             plugin.configure(noKeys);
             assert !host.subscriptions.contains("device.key") && host.lastKey == null;

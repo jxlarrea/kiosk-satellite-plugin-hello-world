@@ -96,14 +96,38 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control`, `shizuku` and `screensaver` |
 | `settings` | Up to 20 settings |
 | `commands` | Up to 20 named commands |
+| `triggers` | Up to 20 named [gesture triggers](#gesture-triggers) |
 
-A setting declares `key`, `title`, `type` and `default`. Types are `string`, `boolean`, `number`, `color`, `select` and `entity`. Strings allow up to 512 characters. Keys start with a letter and contain letters, digits or underscores. A command declares `id` and `title`. Command IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
+A setting declares `key`, `title`, `type` and `default`. Types are `string`, `boolean`, `number`, `color`, `select` and `entity`. Strings allow up to 512 characters. Keys start with a letter and contain letters, digits or underscores. A command or trigger declares `id` and `title`. Their IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
 
 Settings and commands are scoped to the plugin ID. Do not change that ID after publication. Increasing a plugin's own version does not increase the SDK version.
 
 Declared commands are reusable actions. Users can select them in **Gestures > Run a plugin action**. The plugin subpage lets users opt each command into the kiosk drawer or expose it as an ESPHome button in Home Assistant. Settings configures those placements and does not run the command. These connections work with all supported SDK versions without additional plugin capabilities.
 
 Keep command IDs stable across releases. The host retains shortcut choices for commands that survive an update and removes choices for deleted commands. New commands start without drawer or Home Assistant exposure. Commands run through `execute` only while the plugin is running. A saved gesture targeting a disabled or missing plugin reports a failure. Plugins should use hardware entities such as RGB lights for ongoing stateful control and commands for individual operations.
+
+## Gesture triggers
+
+Declared triggers let a plugin start any gesture action, the way a corner tap or a clap does. Users pick them in **Gestures > Plugin trigger** and choose what each one runs: a dashboard view, a Home Assistant script or anything else the Gestures page offers. Fire a trigger with `host.fireTrigger(id)` when the plugin notices something KS does not watch by itself, such as a button press reported through [`device.key`](ks-api.md#hardware-keys) or a proprietary sensor.
+
+```json
+"triggers": [
+  { "id": "hardwareKey", "title": "Hardware key" }
+]
+```
+
+```java
+host.fireTrigger("hardwareKey");
+```
+
+- Each fire runs every gesture mapped to that trigger. With nothing mapped, it does nothing.
+- KS drops fires past four per second per plugin instead of failing the plugin, so a held or bouncing button cannot flood actions.
+- An undeclared ID throws `IllegalArgumentException`. Calling it after the plugin stops throws `IllegalStateException`.
+- Lockdown Mode and Kiosk Mode's Disable Gestures silence triggers like the other gestures.
+- Kiosk Satellite versions without gesture triggers throw `UnsupportedOperationException`. Catch it if the plugin should keep working there.
+- No extra capability or SDK version is required.
+
+Keep trigger IDs stable across releases. A gesture saved for a trigger that a later version removes no longer fires. Plugins are installed per kiosk, so Fleet Management does not sync gestures that use a plugin trigger. Hello World fires `hardwareKey` from its Hardware keys demo.
 
 ## Lifecycle
 

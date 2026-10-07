@@ -79,6 +79,7 @@ The existing authenticated command API exposes these commands:
 | `removePlugin` | `id` |
 | `configurePlugin` | `id`, `values`: complete settings object |
 | `getPluginActions` | None. Returns declared actions and their availability |
+| `getPluginTriggers` | None. Returns declared gesture triggers and their availability |
 | `configurePluginAction` | `id`, `command`, `drawer`: boolean, `homeAssistant`: boolean |
 | `runPluginCommand` | `id`, `command`: manifest command ID |
 

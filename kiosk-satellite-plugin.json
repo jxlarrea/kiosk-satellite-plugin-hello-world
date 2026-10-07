@@ -203,6 +203,12 @@
       "title": "Hide window"
     }
   ],
+  "triggers": [
+    {
+      "id": "hardwareKey",
+      "title": "Hardware key"
+    }
+  ],
   "groups": [
     {
       "title": "Greeting window"

@@ -202,6 +202,8 @@ if (event.equals("ks.device.key") && "down".equals(payload.get("action"))) {
 }
 ```
 
+To let a press run any action the user picks under **Gestures**, declare a [gesture trigger](creating-plugins.md#gesture-triggers) and call `host.fireTrigger` from the press. No `host.control` is needed for that.
+
 With `host.control`, a plugin can turn the presses into volume changes. Read the current level with `getVolume`, keep it up to date from `device.volume` and write the new one with `setVolume`:
 
 ```java

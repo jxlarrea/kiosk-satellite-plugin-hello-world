@@ -34,6 +34,8 @@ public interface PluginHost {
     default void publishStatusTile(String key, String title, String level, String text) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
     /** Remove this session's status tile with the given key. */
     default void removeStatusTile(String key) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
+    /** SDK 1. Fire a trigger declared in the manifest. Gestures mapped to it run their actions. At most four per second, extras are dropped. */
+    default void fireTrigger(String id) { throw new UnsupportedOperationException("Gesture triggers are unavailable"); }
     /** Show or update this plugin's one floating window. Text is plain text. */
     void showWindow(String title, String message, String buttonLabel);
     void hideWindow();

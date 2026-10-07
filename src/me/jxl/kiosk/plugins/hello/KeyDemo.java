@@ -4,7 +4,10 @@ package me.jxl.kiosk.plugins.hello;
 import java.util.Map;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Shows the last hardware key KS received, such as a volume or remote button. */
+/**
+ * Shows the last hardware key KS received, such as a volume or remote button,
+ * and fires the hardwareKey gesture trigger for each press.
+ */
 final class KeyDemo {
     private PluginHost host;
     private boolean watching;
@@ -30,6 +33,9 @@ final class KeyDemo {
         // One count per press: skip the release and the repeats of a held key.
         if (!"down".equals(payload.get("action")) || !Integer.valueOf(0).equals(payload.get("repeat"))) return;
         presses++;
+        // Gestures mapped to Plugin trigger > Hello World: Hardware key run now.
+        // Older KS versions have no gesture triggers and the readings still work there.
+        try { host.fireTrigger("hardwareKey"); } catch (UnsupportedOperationException olderHost) {}
         host.publishTextSensor("last_key", "Last hardware key",
             payload.get("key") + " (scan code " + payload.get("scanCode") + "), " + presses + (presses == 1 ? " press" : " presses"));
     }

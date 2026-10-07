@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add SDK 1 gesture triggers: declare `triggers` in the manifest and call `host.fireTrigger(id)` so a gesture mapped to the trigger runs its action. The Hardware keys demo declares a Hardware key trigger and fires it for each press. Document the manifest field, the four fires per second limit, the errors and the fallback for older Kiosk Satellite versions.
+
 - Document the SDK 1 `setVolume` control and the `channel` argument of `getVolume`, covering the master, media, assistant and intercom volumes, and the `device.volume` event now firing for all four.
 
 - Add a Hardware keys demo group that subscribes to `device.key` while Show hardware keys is on and shows the last key, its scan code and a press count under Readings. Document the SDK 1 `device.key` event, its payload, filtering of typed text and its queue limit.

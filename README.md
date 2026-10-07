@@ -110,7 +110,7 @@ Enable Hello World, then select **DVD Logo (Hello World)** under **Screensaver >
 
 ### Try hardware keys
 
-The **Hardware keys demo** group subscribes to `device.key` while **Show hardware keys** is on. Press a volume, media or remote button with KS in the foreground. **Last hardware key** under Readings shows the key name, its scan code and a press count. Buttons without an Android key code can show as `UNKNOWN` with their scan code. See [hardware keys](docs/ks-api.md#hardware-keys) and [KeyDemo.java](src/me/jxl/kiosk/plugins/hello/KeyDemo.java).
+The **Hardware keys demo** group subscribes to `device.key` while **Show hardware keys** is on. Press a volume, media or remote button with KS in the foreground. **Last hardware key** under Readings shows the key name, its scan code and a press count. Buttons without an Android key code can show as `UNKNOWN` with their scan code. Each press also fires the **Hardware key** gesture trigger, so a gesture set to **Plugin trigger > Hello World: Hardware key** under **Gestures** runs its action. See [hardware keys](docs/ks-api.md#hardware-keys), [gesture triggers](docs/creating-plugins.md#gesture-triggers) and [KeyDemo.java](src/me/jxl/kiosk/plugins/hello/KeyDemo.java).
 
 ### Try Shizuku
 
