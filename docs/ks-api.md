@@ -15,6 +15,7 @@ Every plugin declares `"apiVersion": 1`. All features below belong to that singl
 | `entities` | Publish and remove its own RGB lights, sensors, selects and switches |
 | `host.read` | Execute read commands and subscribe to passive events |
 | `host.control` | Execute the transient controls listed below |
+| `noise` | Read the [room noise level](#room-noise-level). Requires `host.read` |
 
 Request only the capabilities the plugin uses. `getHostApi` is available with either host capability and lists the commands and events available to that session. Plugins execute inside the app and are not sandboxed from arbitrary Java or native code. These capabilities describe the public API contract. Users must trust installed code.
 
@@ -57,6 +58,7 @@ Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read comma
 | `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
 | `getVoiceState` | `{enabled, state}`. `enabled` is true while the native Voice Satellite runtime is on. `state` is `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
 | `getIntercomState` | `{enabled, state, kiosk, dnd}`. `enabled` is true while the intercom is on. See [Intercom state](#intercom-state) |
+| `getNoiseLevel` | `{available, dbfs, held, updated}`. Requires `noise`. See [Room noise level](#room-noise-level) |
 | `getHaEntityState` | `{entityId: string}` arguments. Returns `{entityId, status, state, attributes, lastChanged, lastUpdated}`. Read-only HA entity snapshot. See the [Home Assistant guide](home-assistant.md) |
 | `haStatus` | `{configured, connected}` booleans reflecting KS's existing Home Assistant connection check. This does not initiate a new connection check |
 
@@ -184,6 +186,7 @@ Pass the subscription name from this table to `subscribe` or `unsubscribe`. Deli
 | `stopword.detected` | No additional fields |
 | `browser.state` | No additional fields. The main WebView URL or saved HA/Start URL changed. Read `getDashboardState` for the current snapshot |
 | `camera.view` | `active`, `viewId`, `viewName` and `focusedCameraId` |
+| `audio.noise` | `available`, `dbfs` and `held`. Requires `noise`. See [Room noise level](#room-noise-level) |
 
 Events are passive observations. Motion, face, person, proximity and wake-word events only exist when the corresponding KS feature is already producing them. A subscription never starts a camera, opens a microphone or changes the screensaver policy. No general event-bus subscription is provided.
 
@@ -269,6 +272,19 @@ Older KS versions reject the `voice.state` subscription with `IllegalArgumentExc
 The event fires only when one of the three values changes. While the intercom is off, `getIntercomState` returns `enabled: false` and no events arrive. Read `getIntercomState` once after subscribing and let an event win over an older read, the same as [Voice Satellite state](#voice-satellite-state). No audio, call IDs or kiosk addresses are included. Older KS versions reject the subscription with `IllegalArgumentException`. See [IntercomDemo.java](../src/me/jxl/kiosk/plugins/hello/IntercomDemo.java).
 
 Entity-specific events use `ha.entity.<entity_id>` with `host.read` and arrive as `ks.ha.entity.<entity_id>`. They include an initial state, live updates and connection status. See the [Home Assistant guide](home-assistant.md) for payloads, limits and subscription cleanup.
+
+### Room noise level
+
+`getNoiseLevel` and `audio.noise` report how loud the room is as one number, so a plugin can lower answers and chimes in a silent house and raise them over the TV with `setVolume`. They need the `noise` capability on top of `host.read`, which tells users the plugin reads the room. The same level feeds the kiosk's **Ambient noise** sensor in Home Assistant.
+
+| Field | Meaning |
+| --- | --- |
+| `available` | False while wake word detection is not listening or the satellite is muted. `dbfs` is null then |
+| `dbfs` | Mean level over 5 seconds as a whole number in dBFS, where 0 is the loudest the microphone records. Null until the first 5 seconds are measured |
+| `held` | True while a voice turn, announcement, timer, alarm, media playback or intercom call runs. Also true right after the kiosk played a sound of its own. `dbfs` keeps its last value then |
+| `updated` | ISO 8601 UTC time of the latest measurement. `getNoiseLevel` only |
+
+`getNoiseLevel` returns the latest 5 second reading. `audio.noise` fires when the level moves by 2 dB or more and when `held` or `available` changes. The level comes from the capture the wake word engine already has open, so subscribing never opens the microphone. No audio, spectrum or speech detection is exposed. The reading is relative to the microphone and its gain, not a calibrated sound level, so let users set thresholds for their room.
 
 ## Lifetime, errors and limits
 
