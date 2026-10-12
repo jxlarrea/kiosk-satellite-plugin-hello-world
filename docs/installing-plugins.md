@@ -69,7 +69,7 @@ The existing authenticated command API exposes these commands:
 | `getPluginStatusTiles` | None. Returns every running plugin's Overview status tiles with the owning plugin's ID and name |
 | `getPluginState` | None. Returns the master `enabled` flag and `plugins` list |
 | `setPluginsEnabled` | `enabled`: boolean master switch |
-| `listPlugins` | None. Returns the installed plugin list |
+| `listPlugins` | None. Returns the installed plugin list. Saved `secret` settings read `__set__` |
 | `previewPluginRepository` | `url`: public GitHub repository URL |
 | `checkPluginUpdate` | `id` |
 | `installPlugin` | Developer testing only. `data`: base64-encoded plugin ZIP up to 4 MB, `trusted`: true |
@@ -77,7 +77,7 @@ The existing authenticated command API exposes these commands:
 | `enablePlugin` | `id` |
 | `disablePlugin` | `id` |
 | `removePlugin` | `id` |
-| `configurePlugin` | `id`, `values`: complete settings object |
+| `configurePlugin` | `id`, `values`: complete settings object. A `secret` setting that is omitted or set to `__set__` keeps its saved value. An empty string clears it |
 | `getPluginActions` | None. Returns declared actions and their availability |
 | `getPluginTriggers` | None. Returns declared gesture triggers and their availability |
 | `configurePluginAction` | `id`, `command`, `drawer`: boolean, `homeAssistant`: boolean |
