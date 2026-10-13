@@ -98,7 +98,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `commands` | Up to 20 named commands |
 | `triggers` | Up to 20 named [gesture triggers](#gesture-triggers) |
 
-A setting declares `key`, `title`, `type` and `default`. Types are `string`, `secret`, `boolean`, `number`, `color`, `select` and `entity`. Strings and secrets allow up to 512 characters. Keys start with a letter and contain letters, digits or underscores. A command or trigger declares `id` and `title`. Their IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
+A setting declares `key`, `title`, `type` and `default`. Types are `string`, `secret`, `boolean`, `number`, `color`, `select`, `entity`, `icon`, `dashboard`, `cameraView` and `list`. Strings and secrets allow up to 512 characters. See [Pickers, lists and conditions](#pickers-lists-and-conditions) for the last four. Keys start with a letter and contain letters, digits or underscores. A command or trigger declares `id` and `title`. Their IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
 
 Settings and commands are scoped to the plugin ID. Do not change that ID after publication. Increasing a plugin's own version does not increase the SDK version.
 
@@ -221,6 +221,61 @@ Declare `shizuku` for optional privileged command execution through KS. The [Shi
 ## Screensavers
 
 Declare `screensaver`, bundle an HTML entry and its resources under `assets/` and register it with `host.publishScreensaverAsset(key, title, entry, data)`. Files load on demand from the verified package. Small inline renderers can still use `host.publishScreensaver(key, title, html)`. It becomes a selectable stock screensaver mode. KS owns all screensaver policy and removes the renderer when the plugin session ends. Hello World includes a bouncing DVD logo with color and size settings. The [screensaver reference](screensavers.md) covers the contract, document limits, lifecycle and fleet behavior.
+
+## Pickers, lists and conditions
+
+Three setting types open the app's own pickers, so users never type an ID:
+
+| Type | Stores | Picker |
+| --- | --- | --- |
+| `icon` | An MDI name such as `mdi:garage`, or an empty string | Every Material Design Icon, searchable by name |
+| `dashboard` | A Home Assistant path such as `lovelace/0`, or an empty string | The dashboard and view picker. Pass the value to `haNavigate` |
+| `cameraView` | A KS camera view ID, or an empty string | The kiosk's camera views by name. Pass the value to `showCameraView` |
+
+A `list` setting holds rows that users add, edit, reorder and delete. Each row is a small form described by `fields`. Row fields take the same types as settings, except `secret`, and can be `required`. On the kiosk the rows show inline on the plugin page and each opens an editor. Remote Admin works the same way and also moves rows with arrow buttons. The whole list saves when the editor's Save is pressed, a row is deleted or rows are reordered.
+
+```json
+{
+  "key": "items", "type": "list", "title": "Items", "group": "Items",
+  "addTitle": "Add item", "maxItems": 12,
+  "row": { "title": "label", "subtitle": ["page", "opens"], "icon": "icon" },
+  "default": [{ "label": "Home", "opens": "Page", "page": "lovelace/0" }],
+  "fields": [
+    { "key": "label", "type": "string", "title": "Label", "required": true },
+    { "key": "icon", "type": "icon", "title": "Icon" },
+    { "key": "opens", "type": "select", "title": "Opens", "options": ["Page", "Menu"] },
+    { "key": "page", "type": "dashboard", "title": "Page", "required": true,
+      "visibleWhen": { "key": "opens", "equals": "Page" } },
+    { "key": "entries", "type": "list", "title": "Entries", "minItems": 1,
+      "visibleWhen": { "key": "opens", "equals": "Menu" },
+      "fields": [{ "key": "label", "type": "string", "title": "Label", "required": true }] }
+  ]
+}
+```
+
+| List field | Meaning |
+| --- | --- |
+| `fields` | 1 to 16 row fields. A row field may leave out `default`. Its type then supplies one: an empty string, `false`, a number's `min`, a select's first option, `#FFFFFF` or an empty list |
+| `maxItems` | Up to 32 rows, which is also the default |
+| `minItems` | Rows the list needs while it is shown. 0 unless set |
+| `addTitle` | The add row's label and the new row editor's title, such as `Add item`. Defaults to Add |
+| `row` | What a row shows: `title` is a field key and defaults to the first `string` field. `subtitle` is a key or up to four keys, and the first one that is shown and not empty wins. `icon` names an `icon` field |
+
+A list can hold one nested list, which opens inside the same editor. Lists cannot go deeper. The editor's Save stays off until every shown `required` field is filled in and every shown list has `minItems` rows. A list counts as one of the 50 settings, and its saved value is at most 32 KB.
+
+`configure` receives a list as a read-only `List` of `Map` rows, in the order the user set. KS fills in every field, so each row has all its keys:
+
+```java
+@SuppressWarnings("unchecked")
+List<Map<String, Object>> items = (List<Map<String, Object>>) settings.get("items");
+for (Map<String, Object> item : items) {
+    String label = (String) item.get("label");
+}
+```
+
+Any setting or row field can declare `visibleWhen`, so it shows only while another field holds a value. The condition names a field declared earlier on the same level and has one test: `equals` or `notEquals` with a value or an array of values, or `"notEmpty": true`. A field that depends on a hidden field hides too. Hidden fields keep their saved values, so read only the fields that apply. `required` counts only while the field is shown.
+
+Older Kiosk Satellite versions reject a manifest that uses these types, `visibleWhen` or `required`. Hello World's **List demo** group uses each of them, and [ListDemo.java](../src/me/jxl/kiosk/plugins/hello/ListDemo.java) reads the list in `configure`.
 
 ## Home Assistant entity settings and reads
 

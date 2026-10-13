@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add a List demo group with a Shortcuts list setting, whose rows open a page, a camera view or a nested list of menu entries, and Favorite page, Featured icon and Camera view picker settings. Camera view only shows while Use a camera view is on. Shortcuts received and Picker values under List demo readings show what `configure` received. Document the `list` setting type, which holds rows users add, edit, reorder and delete, with one nested list allowed. Document the `icon`, `dashboard` and `cameraView` picker types and the `visibleWhen` and `required` fields. Hello World now needs a Kiosk Satellite version with these setting types.
+
 - Document the `secret` setting type for passwords, tokens and API keys. Kiosk Satellite masks it in the Plugin Manager and Remote Admin and reports a saved value as `__set__` in `listPlugins` and `getPluginState`.
 
 - Add `KsTheme.styleSlider`, which styles a `SeekBar` like the Kiosk Satellite sliders, and a slider to the Hello World top bar.

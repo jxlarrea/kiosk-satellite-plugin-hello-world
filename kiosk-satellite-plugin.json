@@ -207,6 +207,140 @@
       "default": "",
       "group": "Home Assistant demo",
       "description": "Choose an entity to show its state and follow changes through Kiosk Satellite."
+    },
+    {
+      "key": "shortcuts",
+      "type": "list",
+      "title": "Shortcuts",
+      "group": "List demo",
+      "addTitle": "Add shortcut",
+      "maxItems": 8,
+      "description": "Each row is a small form. Drag a row by its handle to reorder it.",
+      "row": {
+        "title": "label",
+        "subtitle": [
+          "page",
+          "camera",
+          "opens"
+        ],
+        "icon": "icon"
+      },
+      "default": [
+        {
+          "label": "Home",
+          "icon": "mdi:home",
+          "opens": "Page",
+          "page": "lovelace/0"
+        }
+      ],
+      "fields": [
+        {
+          "key": "label",
+          "type": "string",
+          "title": "Label",
+          "required": true
+        },
+        {
+          "key": "icon",
+          "type": "icon",
+          "title": "Icon"
+        },
+        {
+          "key": "opens",
+          "type": "select",
+          "title": "Opens",
+          "options": [
+            "Page",
+            "Camera view",
+            "Menu"
+          ]
+        },
+        {
+          "key": "page",
+          "type": "dashboard",
+          "title": "Page",
+          "required": true,
+          "visibleWhen": {
+            "key": "opens",
+            "equals": "Page"
+          }
+        },
+        {
+          "key": "camera",
+          "type": "cameraView",
+          "title": "Camera view",
+          "required": true,
+          "visibleWhen": {
+            "key": "opens",
+            "equals": "Camera view"
+          }
+        },
+        {
+          "key": "entries",
+          "type": "list",
+          "title": "Menu entries",
+          "addTitle": "Add entry",
+          "minItems": 1,
+          "maxItems": 6,
+          "description": "A nested list opens inside the same editor.",
+          "visibleWhen": {
+            "key": "opens",
+            "equals": "Menu"
+          },
+          "row": {
+            "title": "label",
+            "subtitle": "page"
+          },
+          "fields": [
+            {
+              "key": "label",
+              "type": "string",
+              "title": "Label",
+              "required": true
+            },
+            {
+              "key": "page",
+              "type": "dashboard",
+              "title": "Page"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "favoritePage",
+      "type": "dashboard",
+      "title": "Favorite page",
+      "default": "",
+      "group": "List demo",
+      "description": "Picked from your Home Assistant dashboards."
+    },
+    {
+      "key": "featuredIcon",
+      "type": "icon",
+      "title": "Featured icon",
+      "default": "mdi:star",
+      "group": "List demo",
+      "description": "Picked from every Material Design Icon."
+    },
+    {
+      "key": "showCamera",
+      "type": "boolean",
+      "title": "Use a camera view",
+      "default": false,
+      "group": "List demo",
+      "description": "Shows the next setting, which stays hidden while this is off."
+    },
+    {
+      "key": "cameraView",
+      "type": "cameraView",
+      "title": "Camera view",
+      "default": "",
+      "group": "List demo",
+      "visibleWhen": {
+        "key": "showCamera",
+        "equals": true
+      }
     }
   ],
   "commands": [
@@ -307,6 +441,14 @@
     },
     {
       "title": "Screensaver demo"
+    },
+    {
+      "title": "List demo",
+      "readingsTitle": "List demo readings",
+      "readings": [
+        "text_sensor.list_summary",
+        "text_sensor.picker_values"
+      ]
     }
   ]
 }

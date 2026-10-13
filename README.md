@@ -73,7 +73,7 @@ The plugin runs trusted code inside Kiosk Satellite. It can access app data and 
 
 Tap the Hello World entry to open its subpage. **Greeting** changes the message. **Show window when enabled** controls whether it opens automatically. Settings save automatically. On the kiosk, tap **Greeting** to edit it in a dialog.
 
-The settings are grouped into **Greeting window**, **Chart demo**, **Home Assistant demo**, **Shizuku demo**, **Status tile demo** and **Screensaver demo**. The chart uses simulated values, not device measurements. Its 120-sample history covers about four minutes and updates every two seconds while **Show demo chart** is on.
+The settings are grouped into **Greeting window**, **Chart demo**, **Home Assistant demo**, **Shizuku demo**, **Status tile demo**, **Screensaver demo** and **List demo**. The chart uses simulated values, not device measurements. Its 120-sample history covers about four minutes and updates every two seconds while **Show demo chart** is on.
 
 | Control | Example |
 | --- | --- |
@@ -124,6 +124,10 @@ The **Voice Satellite demo** group subscribes to `voice.state` while **Show Voic
 ### Try intercom state
 
 The **Intercom demo** group subscribes to `intercom.state` while **Show intercom state** is on. With the intercom on, call this kiosk from another one. **Intercom state** under Readings shows ringing, the call and its end, with the other kiosk's name. See [Intercom state](docs/ks-api.md#intercom-state) and [IntercomDemo.java](src/me/jxl/kiosk/plugins/hello/IntercomDemo.java).
+
+### Try list settings
+
+The **List demo** group shows a list setting and the picker settings. **Shortcuts** lists its rows on the subpage. Tap one to edit it, drag its handle to move it or tap **Add shortcut**. **Opens** decides which field shows next: a **Page** from the dashboard picker, a **Camera view** or **Menu entries**, a nested list that opens inside the same editor. **Favorite page**, **Featured icon** and **Camera view** use the same pickers on their own, and **Camera view** only shows while **Use a camera view** is on. **Shortcuts received** and **Picker values** under List demo readings show what `configure` received. See [pickers, lists and conditions](docs/creating-plugins.md#pickers-lists-and-conditions) and [ListDemo.java](src/me/jxl/kiosk/plugins/hello/ListDemo.java).
 
 ### Try Shizuku
 

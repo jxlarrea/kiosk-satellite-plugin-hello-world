@@ -12,13 +12,14 @@ import java.util.concurrent.TimeUnit;
 import me.jxl.kiosk.plugins.KioskPlugin;
 import me.jxl.kiosk.plugins.PluginHost;
 
-/** Settings controls, a floating window, native overlays, actions, live readings, a read-only chart, an Overview status tile, hardware keys, Voice Satellite state and intercom state. */
+/** Settings controls including lists and pickers, a floating window, native overlays, actions, live readings, a read-only chart, an Overview status tile, hardware keys, Voice Satellite state and intercom state. */
 public final class HelloWorldPlugin implements KioskPlugin {
     private final HomeAssistantDemo homeAssistant = new HomeAssistantDemo();
     private final StatusTileDemo statusTile = new StatusTileDemo();
     private final KeyDemo keys = new KeyDemo();
     private final VoiceDemo voice = new VoiceDemo();
     private final IntercomDemo intercom = new IntercomDemo();
+    private final ListDemo lists = new ListDemo();
     private final OverlayDemo overlays = new OverlayDemo();
     private PluginHost host;
     private final ShizukuDemo shizuku = new ShizukuDemo();
@@ -79,6 +80,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         keys.configure(host, settings);
         voice.configure(host, settings);
         intercom.configure(host, settings);
+        lists.configure(host, settings);
         Map<String, Object> nextScreensaver = DvdScreensaver.options(settings);
         if (!nextScreensaver.equals(screensaverOptions)) {
             host.publishScreensaverAsset("dvd", "DVD Logo", "dvd/index.html", nextScreensaver);
