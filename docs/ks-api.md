@@ -55,6 +55,8 @@ Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read comma
 | `getFaceEnabled` | Boolean indicating whether camera face detection is enabled |
 | `getProximityEnabled` | Boolean indicating whether proximity detection is enabled |
 | `getCameraViewState` | `{active, viewId, viewName, focusedCameraId}` for the existing camera overlay. IDs and name can be null. No images or stream URLs |
+| `getCameraViews` | A list of `{id, name, cameraCount}`, one per camera view set up in KS, in their order. Pass `id` to `showCameraView`. No servers, stream URLs or credentials |
+| `getDashboards` | A list of `{urlPath, title, icon, custom, views}`, one per Home Assistant dashboard, with `views` a list of `{path, title, icon, subview}`. Pass a view's `path` to `haNavigate`. Icons are MDI names or null. `custom` marks KS's Custom Pages entry. Fails while Home Assistant is not set up or cannot be reached |
 | `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
 | `getVoiceState` | `{enabled, state}`. `enabled` is true while the native Voice Satellite runtime is on. `state` is `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
 | `getIntercomState` | `{enabled, state, kiosk, dnd}`. `enabled` is true while the intercom is on. See [Intercom state](#intercom-state) |
@@ -136,10 +138,10 @@ host.executeCommand("showCameraView", Collections.singletonMap("viewId", "front-
 | `loadUrl` | `{url: string}`. Navigate the main WebView to HTTP or HTTPS. Does not change the saved Start URL |
 | `loadDashboard` | `{dashboard: string}`. Navigate to a dashboard path on the configured HA server |
 | `loadStartUrl` | `{}`. Navigate to the saved Start URL |
-| `haNavigate` | `{path: string}`. Navigate to a dashboard view and dismiss obstructing overlays. Returns whether navigation succeeded |
+| `haNavigate` | `{path: string}`, such as `lovelace/0` or `cameras/0?camera=garage`. Navigate to a dashboard view and dismiss obstructing overlays. Returns true once the page is on the view, including when it already was, and false when it could not move, for example while a page that is not Home Assistant is on screen. The result can take a few seconds while KS checks that the view rendered |
 | `reload` | `{}`. Reload the current dashboard page without clearing browser data |
 
-Controls return null on success unless the table documents a boolean result. Missing configuration, unsupported media commands and normal KS feature gates can cause failure. URLs must not contain credentials or use executable schemes such as `javascript:`. Dashboard and view paths accept slash-separated letters, digits, underscores and hyphens. Unknown arguments are rejected.
+Controls return null on success unless the table documents a boolean result. Missing configuration, unsupported media commands and normal KS feature gates can cause failure. URLs must not contain credentials or use executable schemes such as `javascript:`. Dashboard paths accept slash-separated letters, digits, underscores and hyphens. `haNavigate` paths also accept dots, a query string and a fragment, but no `.` or `..` segments. Unknown arguments are rejected.
 
 These commands change live presentation or playback without editing saved configuration or content. Navigation can leave an unfinished form and screen-off can interrupt someone using the device. Authors should make these behaviors intentional. The usual screensaver session bookkeeping and idle behavior still apply. Plugins cannot take ownership of shared internal voice suppression or screen wake-lock flags.
 
@@ -316,6 +318,8 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `saveSettings(values)` | Saves values validated against the plugin's declared settings. Unknown keys are rejected and omitted values use defaults. Does not invoke `configure` again |
 | `nativeLibraryPath(name)` | Verified per-session path to a packaged library matching the process ABI. Pass `rockchip_led` for `librockchip_led.so` |
 | `packagePath()` | Verified plugin DEX JAR path, for a plugin-owned helper |
+| `assetPath(name)` | Absolute path to a verified, read-only file under the package's `assets/` folder, such as `fonts/icons.ttf` for `Typeface.createFromFile`. Throws `IllegalArgumentException` for a missing file or a path that leaves `assets/`. No capability is required |
+| `openAsset(name)` | Opens the same file as an `InputStream`. Close it when done |
 | `publishLight(key, name, effects, state)` | Registers or updates a plugin-owned RGB light. At most four lights, 24 effects per light and bounded names. See [RGB states](creating-plugins.md#rich-settings-and-hardware) |
 | `publishSensor`, `publishTextSensor`, `publishBinarySensor` | Publish numeric, text or boolean readings shown on the plugin subpage and exposed through ESPHome. See the [entity API](entities.md) for signatures, metadata and limits |
 | `publishSwitch(key, name, state)` | Publish a writable switch with a confirmed boolean state. Commands arrive as `onEvent("switch.KEY", {"on": boolean})`. See the [entity API](entities.md#writable-switches) |

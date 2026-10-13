@@ -27,6 +27,22 @@ Each call replaces the overlay at that key with a fresh view from the new factor
 | `spec` | Placement, size and behavior. See below |
 | `factory` | Builds the view. KS calls it on the Android main thread |
 
+### Threads and timing
+
+`showOverlay` and `hideOverlay` never block and are safe to call from any thread, the main thread and click listeners included. Each records the change and returns. KS builds the view afterward, so `create` and `onDestroy` never run inside the call, even when it comes from the main thread. Both always run on the main thread.
+
+- A `hideOverlay` that follows `showOverlay` before the view is built cancels it, and `create` never runs for it.
+- When you replace an overlay, the new view's `create` and the old view's `onDestroy` both run later. Do not rely on their order. Keep state that both views share outside the view.
+- The view appears once KS has laid it out, which takes at least one frame after the call.
+
+### Reuse overlays
+
+Each overlay is its own Android view hosted inside KS's Flutter screen, and creating one is the expensive part. A fast tablet shows a new overlay within a frame or two. A low-power panel can take a second or more, and much longer while a busy dashboard keeps it drawing. Replacing an overlay at the same key creates a new view too. Changes inside an existing view, such as text, colors or what is visible, are as quick as in any Android app.
+
+- Keep one long-lived overlay for anything that changes often, like a bar that collapses into a tab, and change its contents instead of replacing it.
+- Show a separate overlay for something short-lived, like a menu, and keep it small.
+- Avoid calling `showOverlay` on every state change.
+
 ## Placement and size
 
 `OverlaySpec` describes where the overlay sits. Sizes and insets are in dp.
@@ -100,6 +116,7 @@ An overlay with `onTop(true)` moves to the slot of the KS voice overlay, over th
 - Disabling, uninstalling, updating or stopping the plugin, stopping the app or turning off **Enable Plugins** removes the session's overlays. Overlays are never persisted or included in fleet sync.
 - KS revokes the host before calling `stop`. A `hideOverlay` call there is ignored.
 - Kiosk Satellite versions without native overlays throw `UnsupportedOperationException`. Catch it if the plugin should keep working there.
+- Remote Admin screenshots and the `screenshot` command copy the kiosk's window, and an overlay can be missing from them or show an earlier state. To check what an overlay looks like on the panel, use `adb exec-out screencap -p > screen.png`.
 
 ## Errors in view code
 

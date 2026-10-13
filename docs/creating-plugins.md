@@ -187,6 +187,7 @@ The `native` capability allows shared libraries under `native/ABI/libNAME.so`, w
 | --- | --- |
 | `nativeLibraryPath(name)` | Absolute path to a verified session copy of `libNAME.so`. Requires `native` |
 | `packagePath()` | Verified DEX container path for a plugin-owned helper. Requires `native` |
+| `assetPath(name)` / `openAsset(name)` | Path to, or a stream of, a verified file under `assets/`, such as a font or icon set. No capability is required. Older Kiosk Satellite versions throw `UnsupportedOperationException` |
 | `status(message, error)` | Runtime status text in the plugin subpage, up to 1000 characters |
 | `saveSettings(values)` | Validate and persist plugin-originated setting changes |
 | `publishLight(key, name, effects, state)` | Register or update an RGB light. Requires `entities` |

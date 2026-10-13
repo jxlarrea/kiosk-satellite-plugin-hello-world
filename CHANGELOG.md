@@ -4,6 +4,16 @@
 
 ### Added
 
+- Document the SDK 1 `getCameraViews` and `getDashboards` reads, which list camera views by name and Home Assistant dashboards with their views, ready for `showCameraView` and `haNavigate`.
+
+- Add `host.assetPath(name)` and `host.openAsset(name)`, which give plugin code a verified file from its own `assets/` folder, such as a font.
+
+- Document that `haNavigate` accepts a query string and a fragment, and that it returns true once the page is on the view.
+
+- Document the overlay threading contract: `showOverlay` and `hideOverlay` never block, and `create` and `onDestroy` run later on the main thread. Document that creating an overlay is the expensive part, so plugins should reuse a long-lived overlay, and that screenshots can miss native overlays.
+
+- Find `d8.bat` on Windows in `tools/build.py`, and skip the two asset tests that need symbolic links or `?` and `#` in file names there.
+
 - Add a List demo group with a Shortcuts list setting, whose rows open a page, a camera view or a nested list of menu entries, and Favorite page, Featured icon and Camera view picker settings. Camera view only shows while Use a camera view is on. Shortcuts received and Picker values under List demo readings show what `configure` received. Document the `list` setting type, which holds rows users add, edit, reorder and delete, with one nested list allowed. Document the `icon`, `dashboard` and `cameraView` picker types and the `visibleWhen` and `required` fields. Hello World now needs a Kiosk Satellite version with these setting types.
 
 - Document the `secret` setting type for passwords, tokens and API keys. Kiosk Satellite masks it in the Plugin Manager and Remote Admin and reports a saved value as `__set__` in `listPlugins` and `getPluginState`.

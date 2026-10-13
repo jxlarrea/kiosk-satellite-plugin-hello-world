@@ -36,7 +36,7 @@ public interface PluginHost {
     default void removeStatusTile(String key) { throw new UnsupportedOperationException("Status tiles are unavailable"); }
     /** SDK 1. Fire a trigger declared in the manifest. Gestures mapped to it run their actions. At most four per second, extras are dropped. */
     default void fireTrigger(String id) { throw new UnsupportedOperationException("Gesture triggers are unavailable"); }
-    /** SDK 1, overlay. Show a native overlay, or replace the one with this key. KS builds its view on the main thread through the factory. At most four per plugin. */
+    /** SDK 1, overlay. Show a native overlay, or replace the one with this key. Never blocks: KS builds its view later on the main thread through the factory. At most four per plugin. */
     default void showOverlay(String key, OverlaySpec spec, OverlayFactory factory) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
     /** SDK 1, overlay. Remove an overlay. Unknown keys are ignored. */
     default void hideOverlay(String key) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
@@ -48,6 +48,10 @@ public interface PluginHost {
     default String nativeLibraryPath(String name) { throw new UnsupportedOperationException("SDK 1 required"); }
     /** SDK 1. Verified DEX container, for a plugin-owned helper process. */
     default String packagePath() { throw new UnsupportedOperationException("SDK 1 required"); }
+    /** SDK 1. Absolute path to a verified, read-only file under the package's assets folder, such as a font for Typeface.createFromFile. */
+    default String assetPath(String name) { throw new UnsupportedOperationException("Plugin assets are unavailable"); }
+    /** SDK 1. Open a verified file under the package's assets folder for reading. The caller closes the stream. */
+    default java.io.InputStream openAsset(String name) throws java.io.IOException { throw new UnsupportedOperationException("Plugin assets are unavailable"); }
     /** SDK 1. Display a runtime status in the plugin subpage. */
     default void status(String message, boolean error) { throw new UnsupportedOperationException("SDK 1 required"); }
     /** SDK 1. Persist settings changed by plugin actions or Home Assistant. */
