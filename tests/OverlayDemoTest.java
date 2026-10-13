@@ -11,6 +11,7 @@ public final class OverlayDemoTest {
     static final class Host implements PluginHost {
         final Map<String, OverlaySpec> shown = new LinkedHashMap<>();
         final List<String> calls = new ArrayList<>();
+        int[] insets;
         boolean older;
         String status;
         public void showOverlay(String key, OverlaySpec spec, OverlayFactory factory) {
@@ -21,6 +22,10 @@ public final class OverlayDemoTest {
         public void hideOverlay(String key) {
             if (older) throw new UnsupportedOperationException("Native overlays are unavailable");
             shown.remove(key); calls.add("hide " + key);
+        }
+        public void setContentInsets(int left, int top, int right, int bottom) {
+            if (older) throw new UnsupportedOperationException("Content insets are unavailable");
+            insets = new int[] {left, top, right, bottom};
         }
         public void showWindow(String title, String message, String button) {}
         public void hideWindow() {}
@@ -67,6 +72,10 @@ public final class OverlayDemoTest {
         assert !host.shown.containsKey(OverlayDemo.GLOW);
 
         demo.hideBar();
+        // Hiding the bar gives its space back to the dashboard.
+        assert java.util.Arrays.equals(host.insets, new int[] {0, 0, 0, 0});
+        demo.reserve(84);
+        assert host.insets[1] == 84;
         assert !host.shown.containsKey(OverlayDemo.BAR) && host.shown.containsKey(OverlayDemo.FULL);
 
         demo.stop();

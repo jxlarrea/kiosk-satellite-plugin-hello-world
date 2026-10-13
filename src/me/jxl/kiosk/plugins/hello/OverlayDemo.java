@@ -58,6 +58,21 @@ final class OverlayDemo {
     synchronized void hideBar() {
         if (host == null) return;
         try { host.hideOverlay(MENU); host.hideOverlay(BAR); } catch (UnsupportedOperationException olderHost) {}
+        reserve(0);
+    }
+
+    /**
+     * Keeps the dashboard clear of the bar: Home Assistant pads its views
+     * by this much from the top, so its first cards sit below the bar
+     * instead of under it. Zero gives the space back.
+     */
+    synchronized void reserve(int topDp) {
+        if (host == null) return;
+        try {
+            host.setContentInsets(0, topDp, 0, 0);
+        } catch (UnsupportedOperationException | LinkageError olderHost) {
+            // Older Kiosk Satellite versions leave the bar over the dashboard.
+        }
     }
 
     /**
@@ -203,6 +218,12 @@ final class OverlayDemo {
             root.addView(hello, gap);
             root.addView(full);
             root.addView(more, new LinearLayout.LayoutParams(theme.px(44), theme.px(44)));
+            // The bar's depth, from the top edge to just below it, whenever its height changes.
+            root.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                if (bottom - top == oldBottom - oldTop) return;
+                int height = Math.round((bottom - top) / v.getResources().getDisplayMetrics().density);
+                tap(() -> reserve(BAR_INSET + height + 8));
+            });
             onThemeChanged(root, theme);
             return root;
         }

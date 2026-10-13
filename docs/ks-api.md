@@ -309,6 +309,7 @@ These methods operate on resources owned by the plugin and are part of SDK 1.
 | `hideWindow()` | Removes that plugin's window |
 | `showOverlay(key, spec, factory)` | With `overlay`, show or replace a native Android view over the kiosk. Up to four per session. See [native overlays](overlays.md) |
 | `hideOverlay(key)` | Removes that overlay. Unknown keys are ignored |
+| `setContentInsets(left, top, right, bottom)` | With `overlay`, reserve space along the screen edges in dp, so Home Assistant pads its views clear of a bar. See [Keep the dashboard clear](overlays.md#keep-the-dashboard-clear) |
 | `log(message)` | Plugin-prefixed diagnostic log, truncated to 1000 characters |
 | `status(message, error)` | Runtime status in the plugin subpage, at most 1000 characters. Not persisted |
 | `publishScreensaverAsset(key, title, entry, data)` | With `screensaver`, register an HTML asset and scalar rendering options. Bundled resources load on demand from the verified package. See [screensavers](screensavers.md). |

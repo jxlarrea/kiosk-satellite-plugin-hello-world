@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add `host.setContentInsets(left, top, right, bottom)`, which reserves space along the screen edges so Home Assistant pads its views, dialogs and toasts clear of a plugin's bar. The Hello World top bar reserves its depth while it shows. Document it, including the `--ks-content-inset-*` variables custom pages read.
+
 - Add per-edge insets with `OverlaySpec.inset(left, top, right, bottom)` and `offset(x, y)`, which KS keeps on screen, `closeOnOutsideTouch` and `passOutsideTouch` for popups, and `enter`, `exit` and `transitionDuration` with fade, slide and scale transitions. Add `KsTheme.icon(name, role)` and `KsTheme.iconPath(name)`, which draw KS's own Material Design Icons. The top bar now slides in and out, and its new **More** button opens a menu under it that closes on an outside tap. Document all of them and the `LinkageError` fallback for older Kiosk Satellite versions.
 
 - Document the SDK 1 `getCameraViews` and `getDashboards` reads, which list camera views by name and Home Assistant dashboards with their views, ready for `showCameraView` and `haNavigate`.

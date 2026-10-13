@@ -40,6 +40,12 @@ public interface PluginHost {
     default void showOverlay(String key, OverlaySpec spec, OverlayFactory factory) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
     /** SDK 1, overlay. Remove an overlay. Unknown keys are ignored. */
     default void hideOverlay(String key) { throw new UnsupportedOperationException("Native overlays are unavailable"); }
+    /**
+     * SDK 1, overlay. Keep the dashboard clear of a bar: Home Assistant pads its views, dialogs and toasts by these
+     * distances from each edge, 0 to 4096 dp, so nothing hides under the bar. All zero clears it, and so does the end
+     * of the session. With several plugins, each edge keeps the largest.
+     */
+    default void setContentInsets(int left, int top, int right, int bottom) { throw new UnsupportedOperationException("Content insets are unavailable"); }
     /** Show or update this plugin's one floating window. Text is plain text. */
     void showWindow(String title, String message, String buttonLabel);
     void hideWindow();

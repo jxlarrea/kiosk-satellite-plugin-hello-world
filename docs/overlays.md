@@ -109,6 +109,23 @@ KS ships every Material Design Icon that Home Assistant uses, renamed icons incl
 
 The context passed to `create` carries the matching Android `DeviceDefault` light or dark theme, so stock widgets start close to KS. The theme does not change that context later, so restyle in `onThemeChanged`.
 
+## Keep the dashboard clear
+
+An overlay floats over the dashboard, so a bar along an edge covers the cards under it. Call `host.setContentInsets(left, top, right, bottom)` to reserve that space, in dp from each edge, 0 to 4096. Home Assistant pads its views, dialogs, toasts and view buttons by it, through the same safe-area values it uses for a phone's notch, so the first or last cards sit clear of the bar and the dashboard's background still runs under it. Custom pages read the same space from `--ks-content-inset-*` CSS variables. The WebView itself keeps its size.
+
+```java
+// A 64 dp bar 12 dp above the bottom edge.
+host.setContentInsets(0, 0, 0, 76);
+```
+
+- Reserve the bar's full depth, its inset from the edge included. All zero gives the space back.
+- Each call replaces the plugin's previous insets. With several plugins, each edge keeps the largest.
+- KS clears them when the session ends, so a disabled or stopped plugin never leaves a gap.
+- The page lays itself out again when the insets change. Keep the space while a bar tucks away for a moment, rather than freeing and reserving it on every change.
+- Requires `overlay`. Kiosk Satellite versions without it throw `UnsupportedOperationException` or `NoSuchMethodError`.
+
+Hello World's top bar reserves its depth whenever its height changes and frees it when hidden.
+
 ## Close on an outside touch
 
 With `closeOnOutsideTouch(true)`, a touch anywhere outside the overlay closes it, the way a popup menu closes, and KS sends `onEvent("overlay.closed", {"key": key})`. By default that touch only closes the overlay, so a tap meant to dismiss a menu does not also press a dashboard button under it. Add `passOutsideTouch(true)` to let it through as well. Touches inside the overlay reach it as usual, and other plugin overlays above it are not "outside".
@@ -162,7 +179,7 @@ An exception thrown from `create`, `onThemeChanged` or `onDestroy` disables the 
 
 ## Hello World demo
 
-Hello World's actions show each kind. **Show top bar** slides a wrapped pill in at the top of the kiosk with a greeting counter, a slider with its value, a filled **Say hello** button, a quiet **Full screen** button and a **More** button drawn with `KsTheme.icon`. **More** opens a menu under the bar, centered on the button with per-edge insets and an offset, which scales in and closes on a tap anywhere else. Back leaves the bar alone, and **Hide top bar** slides it away. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
+Hello World's actions show each kind. **Show top bar** slides a wrapped pill in at the top of the kiosk with a greeting counter, a slider with its value, a filled **Say hello** button, a quiet **Full screen** button and a **More** button drawn with `KsTheme.icon`. **More** opens a menu under the bar, centered on the button with per-edge insets and an offset, which scales in and closes on a tap anywhere else. While it shows, Home Assistant's view starts below it. Back leaves the bar alone, and **Hide top bar** slides it away and gives the space back. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
 
 ## Updating an existing plugin repository
 
