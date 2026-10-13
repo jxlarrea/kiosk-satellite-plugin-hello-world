@@ -43,6 +43,17 @@ public final class OverlayDemoTest {
         assert OverlaySpec.TOP.equals(bar.anchor()) && bar.inset() == 16;
         assert bar.width() == OverlaySpec.WRAP && bar.height() == OverlaySpec.WRAP;
         assert !bar.closeOnBack() && !bar.onTop() && bar.touchable();
+        assert OverlaySpec.SLIDE.equals(bar.enter()) && OverlaySpec.SLIDE.equals(bar.exit()) && bar.transitionDuration() == 250;
+
+        // The menu opens under the bar, moved toward its More button, and closes on a tap outside.
+        demo.showMenu(60, -500);
+        OverlaySpec menu = host.shown.get(OverlayDemo.MENU);
+        assert OverlaySpec.TOP.equals(menu.anchor()) && menu.insetTop() == OverlayDemo.BAR_INSET + 60 + 8;
+        assert menu.insetLeft() == 0 && menu.insetRight() == 0 && menu.insetBottom() == 0 && menu.inset() == 84;
+        assert menu.offsetX() == -500 && menu.offsetY() == 0 && menu.closeOnOutsideTouch() && !menu.passOutsideTouch();
+        assert OverlaySpec.SCALE.equals(menu.enter()) && OverlaySpec.FADE.equals(menu.exit()) && menu.closeOnBack();
+        demo.hideMenu();
+        assert !host.shown.containsKey(OverlayDemo.MENU);
 
         demo.showFull();
         OverlaySpec full = host.shown.get(OverlayDemo.FULL);
@@ -51,6 +62,7 @@ public final class OverlayDemoTest {
         demo.showGlow();
         OverlaySpec glow = host.shown.get(OverlayDemo.GLOW);
         assert glow.width() == OverlaySpec.FILL && glow.onTop() && !glow.touchable() && glow.closeOnBack();
+        assert OverlaySpec.FADE.equals(glow.enter()) && glow.transitionDuration() == 600;
         demo.hideGlow();
         assert !host.shown.containsKey(OverlayDemo.GLOW);
 
@@ -59,7 +71,8 @@ public final class OverlayDemoTest {
 
         demo.stop();
         demo.showFull();
-        assert host.calls.size() == 5;
+        // Hiding the bar takes its menu along.
+        assert host.calls.size() == 8 && host.calls.get(6).equals("hide menu");
 
         Host older = new Host();
         older.older = true;

@@ -6,12 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,17 +24,23 @@ import me.jxl.kiosk.plugins.PluginHost;
 
 /**
  * Native overlays drawn with the KS theme: a small bar at the top of the
- * kiosk, a full screen card and an animated edge glow that draws over
- * everything like the voice overlay while every touch passes through.
- * Views are built on the main thread, so their click listeners run there too.
+ * kiosk with a menu that opens under its More button, a full screen card
+ * and an animated edge glow that draws over everything like the voice
+ * overlay while every touch passes through. Views are built on the main
+ * thread, so their click listeners run there too.
  */
 final class OverlayDemo {
     static final String BAR = "bar";
+    static final String MENU = "menu";
     static final String FULL = "full";
     static final String GLOW = "glow";
+    /** Where the bar sits below the top edge, in dp. */
+    static final int BAR_INSET = 16;
     private PluginHost host;
     private volatile int greetings;
     private volatile int level = 50;
+    /** The bar's greeting, so the menu's Say hello can update it. Touched on the main thread only. */
+    private TextView barLabel;
 
     synchronized void start(PluginHost host) { this.host = host; }
 
@@ -40,7 +48,7 @@ final class OverlayDemo {
     synchronized void showBar() {
         if (host == null) return;
         try {
-            host.showOverlay(BAR, OverlaySpec.at(OverlaySpec.TOP).inset(16).closeOnBack(false), new Bar());
+            host.showOverlay(BAR, animated(OverlaySpec.at(OverlaySpec.TOP).inset(BAR_INSET).closeOnBack(false), OverlaySpec.SLIDE, OverlaySpec.SLIDE, 250), new Bar());
         } catch (UnsupportedOperationException olderHost) {
             host.status("Native overlays need a newer Kiosk Satellite.", true);
         }
@@ -49,14 +57,54 @@ final class OverlayDemo {
     /** The Hide top bar action. */
     synchronized void hideBar() {
         if (host == null) return;
-        try { host.hideOverlay(BAR); } catch (UnsupportedOperationException olderHost) {}
+        try { host.hideOverlay(MENU); host.hideOverlay(BAR); } catch (UnsupportedOperationException olderHost) {}
+    }
+
+    /**
+     * The bar's More button. The menu opens under the bar, centered on the
+     * button: below the bar's depth, then moved sideways by how far the
+     * button is from the middle of the screen. KS keeps it on screen, and a
+     * tap anywhere else closes it.
+     */
+    synchronized void showMenu(int barHeightDp, int fromCenterDp) {
+        if (host == null) return;
+        OverlaySpec spec = OverlaySpec.at(OverlaySpec.TOP);
+        try {
+            spec.inset(0, BAR_INSET + barHeightDp + 8, 0, 0).offset(fromCenterDp, 0).closeOnOutsideTouch(true);
+        } catch (LinkageError olderHost) {
+            // Without per-edge insets the menu sits where the bar is, which still works.
+            spec.inset(BAR_INSET);
+        }
+        host.showOverlay(MENU, animated(spec, OverlaySpec.SCALE, OverlaySpec.FADE, 160), new Menu());
+    }
+
+    synchronized void hideMenu() {
+        if (host != null) host.hideOverlay(MENU);
+    }
+
+    /** Transitions where KS has them. Older versions show and remove overlays at once. */
+    static OverlaySpec animated(OverlaySpec spec, String enter, String exit, int ms) {
+        try {
+            return spec.enter(enter).exit(exit).transitionDuration(ms);
+        } catch (LinkageError olderHost) {
+            return spec;
+        }
+    }
+
+    /** A KS icon, or none on Kiosk Satellite versions without KsTheme.icon. */
+    static Drawable icon(KsTheme theme, String name, String role) {
+        try {
+            return theme.icon(name, role);
+        } catch (LinkageError olderHost) {
+            return null;
+        }
     }
 
     /** The Show full screen overlay action and the bar's Full screen button. Back closes it. */
     synchronized void showFull() {
         if (host == null) return;
         try {
-            host.showOverlay(FULL, OverlaySpec.fullScreen(), new Full());
+            host.showOverlay(FULL, animated(OverlaySpec.fullScreen(), OverlaySpec.FADE, OverlaySpec.FADE, 200), new Full());
         } catch (UnsupportedOperationException olderHost) {
             host.status("Native overlays need a newer Kiosk Satellite.", true);
         }
@@ -70,7 +118,7 @@ final class OverlayDemo {
     synchronized void showGlow() {
         if (host == null) return;
         try {
-            host.showOverlay(GLOW, OverlaySpec.fullScreen().onTop(true).touchable(false), new Glow());
+            host.showOverlay(GLOW, animated(OverlaySpec.fullScreen().onTop(true).touchable(false), OverlaySpec.FADE, OverlaySpec.FADE, 600), new Glow());
         } catch (UnsupportedOperationException olderHost) {
             host.status("Native overlays need a newer Kiosk Satellite.", true);
         }
@@ -113,7 +161,9 @@ final class OverlayDemo {
             TextView value = new TextView(context);
             Button hello = new Button(context);
             Button full = new Button(context);
+            ImageButton more = new ImageButton(context);
             label.setText(greeting());
+            barLabel = label;
             slider.setMax(100);
             slider.setProgress(level);
             value.setText(level + "%");
@@ -132,6 +182,15 @@ final class OverlayDemo {
                 label.setText(greeting());
             });
             full.setOnClickListener(view -> tap(OverlayDemo.this::showFull));
+            more.setContentDescription("More");
+            more.setOnClickListener(view -> tap(() -> {
+                float density = view.getResources().getDisplayMetrics().density;
+                int[] at = new int[2];
+                view.getLocationOnScreen(at);
+                int screen = view.getResources().getDisplayMetrics().widthPixels;
+                int fromCenter = Math.round((at[0] + view.getWidth() / 2f - screen / 2f) / density);
+                showMenu(Math.round(root.getHeight() / density), fromCenter);
+            }));
             root.addView(label);
             LinearLayout.LayoutParams track = new LinearLayout.LayoutParams(theme.px(180), LinearLayout.LayoutParams.WRAP_CONTENT);
             track.setMarginStart(theme.px(12));
@@ -143,6 +202,7 @@ final class OverlayDemo {
             gap.setMarginStart(theme.px(8));
             root.addView(hello, gap);
             root.addView(full);
+            root.addView(more, new LinearLayout.LayoutParams(theme.px(44), theme.px(44)));
             onThemeChanged(root, theme);
             return root;
         }
@@ -158,6 +218,61 @@ final class OverlayDemo {
             theme.styleText((TextView) root.getChildAt(2), 14, 500, "onSurfaceVariant");
             theme.stylePill((TextView) root.getChildAt(3), true);
             theme.stylePill((TextView) root.getChildAt(4), false);
+            ImageButton more = (ImageButton) root.getChildAt(5);
+            more.setImageDrawable(icon(theme, "mdi:dots-vertical", "onSurfaceVariant"));
+            GradientDrawable disc = new GradientDrawable();
+            disc.setShape(GradientDrawable.OVAL);
+            disc.setColor(Color.TRANSPARENT);
+            more.setBackground(disc);
+            more.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        }
+    }
+
+    /** A small card of actions, each with a KS icon. Tapping one closes the menu. */
+    private final class Menu implements OverlayFactory {
+        private final String[][] rows = {
+            {"mdi:hand-wave", "Say hello"},
+            {"mdi:fullscreen", "Full screen"},
+            {"mdi:close", "Hide top bar"},
+        };
+
+        @Override public View create(Context context, KsTheme theme) {
+            LinearLayout card = new LinearLayout(context);
+            card.setOrientation(LinearLayout.VERTICAL);
+            for (int i = 0; i < rows.length; i++) {
+                TextView row = new TextView(context);
+                row.setText(rows[i][1]);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setMinHeight(theme.px(48));
+                final int index = i;
+                row.setOnClickListener(view -> tap(() -> {
+                    hideMenu();
+                    if (index == 0) {
+                        greetings++;
+                        if (barLabel != null) barLabel.setText(greeting());
+                    }
+                    else if (index == 1) showFull();
+                    else hideBar();
+                }));
+                card.addView(row, new LinearLayout.LayoutParams(theme.px(220), LinearLayout.LayoutParams.WRAP_CONTENT));
+            }
+            onThemeChanged(card, theme);
+            return card;
+        }
+
+        @Override public void onThemeChanged(View view, KsTheme theme) {
+            LinearLayout card = (LinearLayout) view;
+            card.setBackground(theme.card());
+            card.setPadding(theme.px(8), theme.px(8), theme.px(8), theme.px(8));
+            for (int i = 0; i < card.getChildCount(); i++) {
+                TextView row = (TextView) card.getChildAt(i);
+                theme.styleText(row, 15, 500, "onSurface");
+                row.setPadding(theme.px(12), 0, theme.px(12), 0);
+                Drawable glyph = icon(theme, rows[i][0], "onSurfaceVariant");
+                if (glyph != null) glyph.setBounds(0, 0, theme.px(22), theme.px(22));
+                row.setCompoundDrawablesRelative(glyph, null, null, null);
+                row.setCompoundDrawablePadding(theme.px(14));
+            }
         }
     }
 

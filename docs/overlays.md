@@ -52,12 +52,20 @@ Each overlay is its own Android view hosted inside KS's Flutter screen, and crea
 | `OverlaySpec.at(anchor)` | A wrapped overlay at `TOP_LEFT`, `TOP`, `TOP_RIGHT`, `LEFT`, `CENTER`, `RIGHT`, `BOTTOM_LEFT`, `BOTTOM` or `BOTTOM_RIGHT` |
 | `OverlaySpec.fullScreen()` | Covers the whole kiosk area |
 | `size(width, height)` | `OverlaySpec.WRAP`, `OverlaySpec.FILL` or 1 to 4096 dp for each side. Both default to `WRAP` |
-| `inset(dp)` | Distance from the kiosk edges, 0 to 200 dp. Defaults to 0 |
+| `inset(dp)` | The same distance from every kiosk edge, 0 to 4096 dp. Defaults to 0 |
+| `inset(left, top, right, bottom)` | A distance from each kiosk edge, 0 to 4096 dp. Use it to keep an overlay clear of a bar, for example a menu above a bottom bar with `inset(0, 0, 0, barHeight)` |
+| `offset(x, y)` | Moves the overlay from its anchored place, -4096 to 4096 dp. Positive x moves right and positive y moves down. Defaults to 0, 0 |
+| `closeOnOutsideTouch(boolean)` | A touch anywhere outside the overlay closes it. Defaults to off. See [Close on an outside touch](#close-on-an-outside-touch) |
+| `passOutsideTouch(boolean)` | With `closeOnOutsideTouch`, the touch that closes the overlay also reaches what is under it. Defaults to off |
+| `enter(transition)`, `exit(transition)` | How the overlay appears and leaves: `NONE`, `FADE`, `SLIDE` or `SCALE`. Both default to `NONE`. See [Transitions](#transitions) |
+| `transitionDuration(ms)` | Length of both transitions, 50 to 1000 ms. Defaults to 200 |
 | `closeOnBack(boolean)` | Whether back closes the overlay. Defaults to on |
 | `onTop(boolean)` | Draw where the KS voice overlay does, over the screensaver, the menu and camera views. Defaults to off |
 | `touchable(boolean)` | Off makes the overlay visual only, and every touch passes through to whatever is under it. Defaults to on |
 
-A `WRAP` side follows the view's measured size and updates when the view asks for a new layout. KS measures it against the kiosk area less the inset on both sides. A `FILL` side takes the whole area less the inset. A fixed size is capped at the available area.
+A `WRAP` side follows the view's measured size and updates when the view asks for a new layout. KS measures it against the kiosk area less the insets on that axis. A `FILL` side takes the whole area less the insets. A fixed size is capped at the available area.
+
+The offset applies after the anchor, and KS keeps the overlay inside the area its insets leave, so a large offset stops at the edge instead of pushing the overlay off screen. With `TOP_LEFT` and no insets, the offset is the overlay's position from the top left of the kiosk area. To open a menu next to a view in another overlay, read that view's position with `getLocationOnScreen`, divide by the display density and offset from the matching anchor. Hello World's **More** menu opens under its button this way.
 
 Transparent and translucent pixels show what is under the overlay, so a full screen view can dim the kiosk or draw effects over it.
 
@@ -94,8 +102,37 @@ The view is drawn into a texture that KS composites with the rest of its screen.
 | `styleText(view, sp, weight, role)` | Applies the typeface, size and a color role to a `TextView` |
 | `stylePill(view, filled)` | Turns a `TextView` or `Button` into a KS pill button. Filled uses `primary`, otherwise it is a quiet text button |
 | `styleSlider(seekBar)` | Styles a `SeekBar` like the KS sliders: a 4 dp track filled in `primary` over `surfaceContainerHighest`, a 20 dp `primary` thumb and a 44 dp touch target |
+| `icon(name, role)` | A Material Design Icon from KS's own set, such as `mdi:garage`, as a `Drawable` in a color role. It is 24 dp unless its bounds say otherwise, and `setTint` recolors it. Null for an unknown name |
+| `iconPath(name)` | The icon's outline as a `Path` on a 24 by 24 grid, for drawing it yourself. Null for an unknown name |
+
+KS ships every Material Design Icon that Home Assistant uses, renamed icons included, so a plugin no longer needs to bundle an icon font. Lookups are quick enough for the main thread, and KS keeps recent icons.
 
 The context passed to `create` carries the matching Android `DeviceDefault` light or dark theme, so stock widgets start close to KS. The theme does not change that context later, so restyle in `onThemeChanged`.
+
+## Close on an outside touch
+
+With `closeOnOutsideTouch(true)`, a touch anywhere outside the overlay closes it, the way a popup menu closes, and KS sends `onEvent("overlay.closed", {"key": key})`. By default that touch only closes the overlay, so a tap meant to dismiss a menu does not also press a dashboard button under it. Add `passOutsideTouch(true)` to let it through as well. Touches inside the overlay reach it as usual, and other plugin overlays above it are not "outside".
+
+```java
+host.showOverlay("menu", OverlaySpec.at(OverlaySpec.BOTTOM_LEFT)
+    .inset(0, 0, 0, barHeight)
+    .offset(itemX, 0)
+    .closeOnOutsideTouch(true)
+    .enter(OverlaySpec.SCALE).exit(OverlaySpec.FADE), factory);
+```
+
+## Transitions
+
+`enter` animates the overlay in once KS has laid it out, and `exit` animates it out when it is hidden, replaced or closed by back or an outside touch. During the exit the view stays alive and takes no touches, and `onDestroy` runs when the exit ends. Replacing an overlay at the same key plays the old view's exit and the new view's enter together, so give the replacement `NONE` to swap its content without a visible change.
+
+| Transition | Effect |
+| --- | --- |
+| `NONE` | Shows or removes the overlay at once |
+| `FADE` | Fades in or out |
+| `SLIDE` | Slides in from, or out to, the edge of its anchor while it fades. A centered overlay rises a little |
+| `SCALE` | Grows from, or shrinks to, a slightly smaller size while it fades. Suits a centered card or a menu |
+
+Overlays of a session that ends, such as a disabled plugin, leave at once without their exit.
 
 ## Back and events
 
@@ -116,6 +153,7 @@ An overlay with `onTop(true)` moves to the slot of the KS voice overlay, over th
 - Disabling, uninstalling, updating or stopping the plugin, stopping the app or turning off **Enable Plugins** removes the session's overlays. Overlays are never persisted or included in fleet sync.
 - KS revokes the host before calling `stop`. A `hideOverlay` call there is ignored.
 - Kiosk Satellite versions without native overlays throw `UnsupportedOperationException`. Catch it if the plugin should keep working there.
+- `OverlaySpec` and `KsTheme` come from Kiosk Satellite at runtime, so a version without per-edge insets, offsets, outside touches, transitions or icons throws `NoSuchMethodError` when you call one. Catch `LinkageError` around those calls to fall back, as Hello World's `animated` and `icon` helpers do.
 - Remote Admin screenshots and the `screenshot` command copy the kiosk's window, and an overlay can be missing from them or show an earlier state. To check what an overlay looks like on the panel, use `adb exec-out screencap -p > screen.png`.
 
 ## Errors in view code
@@ -124,7 +162,7 @@ An exception thrown from `create`, `onThemeChanged` or `onDestroy` disables the 
 
 ## Hello World demo
 
-Hello World's actions show each kind. **Show top bar** puts a wrapped pill at the top of the kiosk with a greeting counter, a slider with its value, a filled **Say hello** button and a quiet **Full screen** button. Back leaves the bar alone, and **Hide top bar** removes it. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
+Hello World's actions show each kind. **Show top bar** slides a wrapped pill in at the top of the kiosk with a greeting counter, a slider with its value, a filled **Say hello** button, a quiet **Full screen** button and a **More** button drawn with `KsTheme.icon`. **More** opens a menu under the bar, centered on the button with per-edge insets and an offset, which scales in and closes on a tap anywhere else. Back leaves the bar alone, and **Hide top bar** slides it away. **Full screen** and the **Show full screen overlay** action open a card centered over a dimmed kiosk. Back, **Close** or a tap outside the card closes it. **Show edge glow** draws a breathing glow along the screen edges with `onTop(true)` and `touchable(false)`: it stays over the screensaver and camera views while the dashboard keeps answering every tap. Back or **Hide edge glow** removes it. Switch KS between its light and dark themes to see them restyle. See [OverlayDemo.java](../src/me/jxl/kiosk/plugins/hello/OverlayDemo.java).
 
 ## Updating an existing plugin repository
 
