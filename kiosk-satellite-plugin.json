@@ -14,7 +14,8 @@
     "entities",
     "shizuku",
     "screensaver",
-    "host.read"
+    "host.read",
+    "ha"
   ],
   "settings": [
     {
@@ -206,7 +207,7 @@
       "title": "Home Assistant entity",
       "default": "",
       "group": "Home Assistant demo",
-      "description": "Choose an entity to show its state and follow changes through Kiosk Satellite."
+      "description": "Choose an entity to show its state, follow its changes and toggle it through Kiosk Satellite."
     },
     {
       "key": "shortcuts",
@@ -371,6 +372,10 @@
     {
       "id": "hideGlow",
       "title": "Hide edge glow"
+    },
+    {
+      "id": "toggleEntity",
+      "title": "Toggle Home Assistant entity"
     }
   ],
   "triggers": [
@@ -404,7 +409,8 @@
       "readingsTitle": "Home Assistant readings",
       "readings": [
         "text_sensor.ha_state",
-        "text_sensor.ha_details"
+        "text_sensor.ha_details",
+        "text_sensor.ha_trigger"
       ]
     },
     {

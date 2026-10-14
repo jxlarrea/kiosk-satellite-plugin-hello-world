@@ -16,6 +16,7 @@ Every plugin declares `"apiVersion": 1`. All features below belong to that singl
 | `host.read` | Execute read commands and subscribe to passive events |
 | `host.control` | Execute the transient controls listed below |
 | `noise` | Read the [room noise level](#room-noise-level). Requires `host.read` |
+| `ha` | Call Home Assistant services, run other commands and subscribe to triggers, events and templates. See the [Home Assistant guide](home-assistant.md#call-services-and-other-commands) |
 
 Request only the capabilities the plugin uses. `getHostApi` is available with either host capability and lists the commands and events available to that session. Plugins execute inside the app and are not sandboxed from arbitrary Java or native code. These capabilities describe the public API contract. Users must trust installed code.
 

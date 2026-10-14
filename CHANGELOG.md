@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add the `ha` capability with `host.haCall(message, callback)`, which sends one Home Assistant WebSocket API command such as `call_service`, and `host.haSubscribe(key, message, callback)` and `host.haUnsubscribe(key)`, which follow triggers, events and templates through `ks.ha.subscription.KEY` events. KS signs in with its own token, numbers the messages and refuses credential commands. The Hello World Home Assistant demo now follows its entity with a state trigger under **Home Assistant trigger** and adds a **Toggle Home Assistant entity** action. Document both in the Home Assistant guide, which now covers reads, calls and subscriptions.
+
 - Add `host.setContentInsets(left, top, right, bottom)`, which reserves space along the screen edges so Home Assistant pads its views, dialogs and toasts clear of a plugin's bar. The Hello World top bar reserves its depth while it shows. Document it, including the `--ks-content-inset-*` variables custom pages read.
 
 - Add per-edge insets with `OverlaySpec.inset(left, top, right, bottom)` and `offset(x, y)`, which KS keeps on screen, `closeOnOutsideTouch` and `passOutsideTouch` for popups, and `enter`, `exit` and `transitionDuration` with fade, slide and scale transitions. Add `KsTheme.icon(name, role)` and `KsTheme.iconPath(name)`, which draw KS's own Material Design Icons. The top bar now slides in and out, and its new **More** button opens a menu under it that closes on an outside tap. Document all of them and the `LinkageError` fallback for older Kiosk Satellite versions.

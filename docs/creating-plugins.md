@@ -93,7 +93,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `description` | Plain text, at most 1000 characters |
 | `author` | Author name, at most 120 characters |
 | `license` | License identifier, at most 120 characters |
-| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control`, `shizuku`, `screensaver` and `noise`. `noise` requires `host.read` |
+| `capabilities` | Any required entries from `overlay`, `native`, `entities`, `host.read`, `host.control`, `ha`, `shizuku`, `screensaver` and `noise`. `noise` requires `host.read` |
 | `settings` | Up to 50 settings. Kiosk Satellite versions without native overlays accept up to 20 |
 | `commands` | Up to 20 named commands |
 | `triggers` | Up to 20 named [gesture triggers](#gesture-triggers) |
@@ -278,9 +278,9 @@ Any setting or row field can declare `visibleWhen`, so it shows only while anoth
 
 Older Kiosk Satellite versions reject a manifest that uses these types, `visibleWhen` or `required`. Hello World's **List demo** group uses each of them, and [ListDemo.java](../src/me/jxl/kiosk/plugins/hello/ListDemo.java) reads the list in `configure`.
 
-## Home Assistant entity settings and reads
+## Home Assistant
 
-Use the `entity` setting type for KS's searchable Home Assistant entity picker in both interfaces. The value is an entity ID or an empty string. Declare `host.read` to read its state or subscribe to changes. See the [Home Assistant entity guide](home-assistant.md) and the Hello World demo.
+Use the `entity` setting type for KS's searchable Home Assistant entity picker in both interfaces. The value is an entity ID or an empty string. Declare `host.read` to read its state or subscribe to changes. Declare `ha` to call services, run other WebSocket API commands and subscribe to triggers, events and templates with `host.haCall` and `host.haSubscribe`. See the [Home Assistant guide](home-assistant.md) and the Hello World demo.
 
 ## Group settings, charts and readings
 

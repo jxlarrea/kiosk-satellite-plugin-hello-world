@@ -157,6 +157,7 @@ public final class HelloWorldPlugin implements KioskPlugin {
         else if ("showFullOverlay".equals(command)) overlays.showFull();
         else if ("showGlow".equals(command)) overlays.showGlow();
         else if ("hideGlow".equals(command)) overlays.hideGlow();
+        else if ("toggleEntity".equals(command)) homeAssistant.toggle();
         else if ("hide".equals(command)) {
             visible = false;
             host.hideWindow();

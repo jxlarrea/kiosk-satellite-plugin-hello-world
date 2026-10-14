@@ -16,6 +16,20 @@ public interface PluginHost {
     default void subscribe(String event) { throw new UnsupportedOperationException("SDK 1 required"); }
     /** SDK 1. Stop observing an event. All subscriptions end with the session. */
     default void unsubscribe(String event) { throw new UnsupportedOperationException("SDK 1 required"); }
+    /**
+     * SDK 1, ha. Send one Home Assistant websocket command without its id, such as {type: "call_service", domain,
+     * service, service_data, target}. KS signs in with its own token and numbers the message. data is HA's result. On
+     * failure, error reads "code: message" and data holds {code, message}. Credential commands are refused.
+     */
+    default void haCall(Map<String, Object> message, CommandCallback callback) { throw new UnsupportedOperationException("Home Assistant access is unavailable"); }
+    /**
+     * SDK 1, ha. Start a Home Assistant subscription, such as subscribe_trigger or render_template, under a key of the
+     * plugin's choosing. The callback says whether HA accepted it. Events arrive through
+     * onEvent("ks.ha.subscription." + key, payload) until haUnsubscribe or the end of the session. At most 16.
+     */
+    default void haSubscribe(String key, Map<String, Object> message, CommandCallback callback) { throw new UnsupportedOperationException("Home Assistant access is unavailable"); }
+    /** SDK 1, ha. End a subscription. Unknown keys are ignored. */
+    default void haUnsubscribe(String key) { throw new UnsupportedOperationException("Home Assistant access is unavailable"); }
     /** SDK 1, shizuku. Current availability, permission, backend UID and version. Does not prompt. */
     default Map<String, Object> shizukuState() { throw new UnsupportedOperationException("Shizuku is unavailable"); }
     /** SDK 1, shizuku. Run an absolute executable with separate arguments after the user grants KS access. */
