@@ -1,6 +1,6 @@
 # Plugin interactions with Kiosk Satellite
 
-SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, except the volume levels `setVolume` changes, and does not manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches, RGB lights and screensaver renderers are also supported.
+SDK 1 is the first public plugin API. Plugins can inspect KS state, observe passive events and use transient controls such as dismissing the screensaver or opening a configured camera view. The host bridge does not edit saved KS settings, except the volume levels `setVolume` changes and the wake word mute `setWakeWordMuted` sets, and does not manage files or change permissions. Plugin-owned windows, settings, charts, actions, sensors, selects, switches, RGB lights and screensaver renderers are also supported.
 
 ## Capabilities
 
@@ -58,7 +58,7 @@ Except for `getBrightness`, `getVolume` and `getHaEntityState`, every read comma
 | `getCameraViewState` | `{active, viewId, viewName, focusedCameraId}` for the existing camera overlay. IDs and name can be null. No images or stream URLs |
 | `getCameraViews` | A list of `{id, name, cameraCount}`, one per camera view set up in KS, in their order. Pass `id` to `showCameraView`. No servers, stream URLs or credentials |
 | `getDashboards` | A list of `{urlPath, title, icon, custom, views}`, one per Home Assistant dashboard, with `views` a list of `{path, title, icon, subview}`. Pass a view's `path` to `haNavigate`. Icons are MDI names or null. `custom` marks KS's Custom Pages entry. Fails while Home Assistant is not set up or cannot be reached |
-| `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel}`. Engine names can be null. No audio, model files or internal configuration |
+| `getWakeWordState` | `{available, stopWordAvailable, enabled, active, listening, engine, engineLabel, status, statusLabel, muted}`. Engine names can be null. No audio, model files or internal configuration |
 | `getVoiceState` | `{enabled, state}`. `enabled` is true while the native Voice Satellite runtime is on. `state` is `idle`, `listening`, `processing` or `responding`. See [Voice Satellite state](#voice-satellite-state) |
 | `getIntercomState` | `{enabled, state, kiosk, dnd}`. `enabled` is true while the intercom is on. See [Intercom state](#intercom-state) |
 | `getNoiseLevel` | `{available, dbfs, held, updated}`. Requires `noise`. See [Room noise level](#room-noise-level) |
@@ -130,6 +130,7 @@ host.executeCommand("showCameraView", Collections.singletonMap("viewId", "front-
 | `hideNowPlaying` | `{}`. Dismiss full-screen Now Playing. Playback and saved preferences stay unchanged. Normal idle behavior can show it again later |
 | `sendspinControl` | `{command: "play" | "pause" | "next" | "previous"}`. Control the current Sendspin group or followed player. Does not edit queues or playlists |
 | `setVolume` | `{percent: string, channel?: string}`. Set a volume from `"0"` to `"100"`. Decimals are allowed. Without a channel, or with `"master"`, it sets the device's media volume. `"media"`, `"assistant"` and `"intercom"` set the matching KS Audio Volume slider, which is saved like a change made in Settings. The master volume has the device's own steps, often 15, so a small change can round to the current level |
+| `setWakeWordMuted` | `{muted: boolean}`. Mute or unmute wake word detection, the same mute as Voice Satellite's Mute switch in Home Assistant. Returns the muted state it set. With Voice Satellite running in the app, KS sets it without Home Assistant. With Voice Satellite running in the dashboard, KS turns the integration's Mute switch through Home Assistant, so `wakeword.state` follows once it applies. Fails while Voice Satellite is off |
 | `showAppLauncher` | `{}`. Open the configured launcher when enabled and apps exist |
 | `hideAppLauncher` | `{}`. Close the launcher overlay |
 | `showOverlayPage` | `{url: string}`. Open an HTTP or HTTPS page over the dashboard without a close button |
