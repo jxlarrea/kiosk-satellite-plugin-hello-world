@@ -60,6 +60,8 @@ public interface PluginHost {
      * of the session. With several plugins, each edge keeps the largest.
      */
     default void setContentInsets(int left, int top, int right, int bottom) { throw new UnsupportedOperationException("Content insets are unavailable"); }
+    /** True on a device without a screen, where overlays, windows and screensavers are never shown. A plugin that declares "headless": true checks this and skips them. */
+    default boolean isHeadless() { return false; }
     /** Show or update this plugin's one floating window. Text is plain text. */
     void showWindow(String title, String message, String buttonLabel);
     void hideWindow();

@@ -97,6 +97,7 @@ See [kiosk-satellite-plugin.json](../kiosk-satellite-plugin.json) for a complete
 | `settings` | Up to 50 settings. Kiosk Satellite versions without native overlays accept up to 20 |
 | `commands` | Up to 20 named commands |
 | `triggers` | Up to 20 named [gesture triggers](#gesture-triggers) |
+| `headless` | Optional. `true` when the plugin also runs on a device without a screen, such as an Echo Dot. See [Devices without a screen](#devices-without-a-screen) |
 
 A setting declares `key`, `title`, `type` and `default`. Types are `string`, `secret`, `boolean`, `number`, `color`, `select`, `entity`, `icon`, `dashboard`, `cameraView` and `list`. Strings and secrets allow up to 512 characters. See [Pickers, lists and conditions](#pickers-lists-and-conditions) for the last four. Keys start with a letter and contain letters, digits or underscores. A command or trigger declares `id` and `title`. Their IDs start with a lowercase letter and contain letters or digits. IDs must be unique within their respective lists.
 
@@ -166,6 +167,20 @@ The window floats over the dashboard and is draggable by its title bar. Other ki
 ## Native overlays
 
 For anything beyond a text window, draw your own Android views with `showOverlay`. A bar at the top of the kiosk and a full screen panel both work, styled with the KS colors, shapes and typeface. See [native overlays](overlays.md).
+
+## Devices without a screen
+
+Kiosk Satellite runs headless on a device without a screen, such as an Echo Dot. Overlays, the floating window and screensavers never show there. A plugin that declares `overlay` or `screensaver` does not install on such a device, from the Plugin Manager or a fleet leader, and reports **This plugin needs a screen**.
+
+A plugin with more to offer than its display, such as entities or Home Assistant automation, sets `"headless": true` in its manifest. It then installs everywhere and checks `host.isHeadless()` in `start` to skip its overlays, window and screensavers. A plugin that declares neither capability runs headless without the flag.
+
+```java
+@Override public void start(PluginHost host, Map<String, Object> settings) {
+    this.host = host;
+    publishSensors();
+    if (!host.isHeadless()) showBar();
+}
+```
 
 ## Trust and compatibility
 

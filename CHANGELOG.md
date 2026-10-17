@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add the optional `headless` manifest field and `host.isHeadless()` for devices without a screen, such as an Echo Dot. A plugin that declares `overlay` or `screensaver` installs there only with `"headless": true`, and then checks `isHeadless()` to skip its display features. Document both under Devices without a screen.
+
 - Document the SDK 1 `setWakeWordMuted` control, which mutes or unmutes wake word detection like Voice Satellite's Mute switch, and the `muted` field `getWakeWordState` now returns.
 
 - Add the `ha` capability with `host.haCall(message, callback)`, which sends one Home Assistant WebSocket API command such as `call_service`, and `host.haSubscribe(key, message, callback)` and `host.haUnsubscribe(key)`, which follow triggers, events and templates through `ks.ha.subscription.KEY` events. KS signs in with its own token, numbers the messages and refuses credential commands. The Hello World Home Assistant demo now follows its entity with a state trigger under **Home Assistant trigger** and adds a **Toggle Home Assistant entity** action. Document both in the Home Assistant guide, which now covers reads, calls and subscriptions.
